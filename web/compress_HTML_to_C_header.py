@@ -5,10 +5,19 @@ import utils
 
 def generate_C_header_content(html_name: str, html_content: bytes, html_content_length: int) -> str:
     """
-    Reads file content as bytes and generates a C/C++ header string.
-    
-    The resulting header defines a length macro and a const uint8_t array
-    containing the file's hexadecimal data.
+    Convert HTML file bytes into a C header string.
+
+    Generates:
+      - A size macro (<NAME>_LEN)
+      - A const uint8_t array containing the file's bytes in 0xXX format.
+
+    Args:
+        html_name: Original HTML filename.
+        html_content: Raw HTML file bytes.
+        html_content_length: Total number of bytes.
+
+    Returns:
+        A C/C++ header string containing the size macro and byte array.
     """
     
     array_name = utils._sanitize_name(html_name)
@@ -39,14 +48,13 @@ def generate_C_header_content(html_name: str, html_content: bytes, html_content_
 
 
 def main(args):
-    
     # Input validation
     if not args or len(args) < 1:
-        print("Usage: python script_name.py <input_html_file>")
+        print("Usage: python compress_HTML_to_C_header.py <input_html_file>")
         print("Output file will be named based on input (e.g., index.html -> index.h)")
         sys.exit(1)
     
-    html_path = Path(args[0])
+    html_path = Path(args[0]).expanduser().resolve()
     
     output_file_name = html_path.with_suffix(".h").name
     output_path = html_path.parent / output_file_name
@@ -75,10 +83,6 @@ def main(args):
         print(f"\nThe file \"{html_path}\" was not found.")
     except Exception as e:
         print(f"An error has occured during processing: {e}")
-
-
-    
-
 
 
 if __name__ == "__main__":
