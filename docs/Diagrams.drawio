@@ -1,0 +1,211 @@
+<mxfile host="65bd71144e">
+    <diagram id="yAcvyHDiNNOWpiPAvSNa" name="System Architecture Diagram">
+        <mxGraphModel dx="2872" dy="2516" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="3" value="&lt;span style=&quot;font-size: 50px;&quot;&gt;&lt;b&gt;&lt;i&gt;Smart Camera Main Diagram&lt;/i&gt;&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fillColor=#eeeeee;strokeColor=#36393d;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="40" width="700" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="group" parent="1" vertex="1" connectable="0">
+                    <mxGeometry x="560" y="390" width="90" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.cpu;" parent="6" vertex="1">
+                    <mxGeometry y="30" width="90" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="ESP32" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="6" vertex="1">
+                    <mxGeometry x="10" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.camera2;" parent="1" vertex="1">
+                    <mxGeometry x="750" y="434" width="78" height="62" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="" style="endArrow=none;startArrow=none;endFill=0;startFill=0;endSize=8;html=1;verticalAlign=bottom;labelBackgroundColor=none;strokeWidth=3;" parent="1" source="4" target="7" edge="1">
+                    <mxGeometry width="160" relative="1" as="geometry">
+                        <mxPoint x="580" y="470" as="sourcePoint"/>
+                        <mxPoint x="740" y="470" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="10" value="" style="image;points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image=img/lib/allied_telesis/computer_and_terminals/Server_Desktop.svg;" parent="1" vertex="1">
+                    <mxGeometry x="230" y="414" width="64.69" height="82" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="move motros (L\R\Up\Down)" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;" parent="1" source="10" target="4" edge="1">
+                    <mxGeometry width="160" relative="1" as="geometry">
+                        <mxPoint x="400" y="454.29" as="sourcePoint"/>
+                        <mxPoint x="560" y="454.29" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="14" value="Send Image via HTTP" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;entryX=0.943;entryY=0.687;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" edge="1">
+                    <mxGeometry x="0.0299" y="25" width="160" relative="1" as="geometry">
+                        <mxPoint x="558.83" y="489.6693462001809" as="sourcePoint"/>
+                        <mxPoint x="291.0026700000001" y="480.00399999999996" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="15" value="" style="points=[[0.13,0.24,0],[0.5,0.2,0],[0.62,0,0],[0.87,0.24,0],[0.95,0.55,0],[0.96,0.95,0],[0.5,1,0],[0.04,0.95,0],[0.05,0.55,0]];verticalLabelPosition=bottom;sketch=0;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco19.joystick_keyboard;fillColor=#005073;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry y="434.44" width="74" height="41.11" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="" style="endArrow=classic;html=1;exitX=0.95;exitY=0.55;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="15" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="180" y="510" as="sourcePoint"/>
+                        <mxPoint x="230" y="460" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="17" value="Move motors via Joystick" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="16" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2329" y="2" relative="1" as="geometry">
+                        <mxPoint x="19" y="-16" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="19" value="Runs Image Recognition Algorithm.&lt;br&gt;&lt;br&gt;When detects movement, moves the camera towards the object" style="shape=note2;boundedLbl=1;whiteSpace=wrap;html=1;size=25;verticalAlign=top;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="170" y="260" width="192.35" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="" style="endArrow=none;dashed=1;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.577;exitY=-0.045;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="10" target="19" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="210" y="520" as="sourcePoint"/>
+                        <mxPoint x="260" y="470" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="21" value="Note: to use Joystick make sure the automatic motor control is detached" style="shape=note2;boundedLbl=1;whiteSpace=wrap;html=1;size=25;verticalAlign=top;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="505" width="170" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="endArrow=none;dashed=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="21" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="140" y="520" as="sourcePoint"/>
+                        <mxPoint x="150" y="460" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="24" value="HTTP over WIFI" style="shape=note2;boundedLbl=1;whiteSpace=wrap;html=1;size=25;verticalAlign=top;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="420" y="530" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="" style="endArrow=none;dashed=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="24">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="320" y="430" as="sourcePoint"/>
+                        <mxPoint x="510" y="490" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="Sequence Diagram" id="M_GdsU3QsUkQmVYp2vma">
+        <mxGraphModel dx="1508" dy="740" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="FufYKLiBR9uRMzQ89UV5-0"/>
+                <mxCell id="FufYKLiBR9uRMzQ89UV5-1" parent="FufYKLiBR9uRMzQ89UV5-0"/>
+                <mxCell id="FufYKLiBR9uRMzQ89UV5-2" value="&lt;span style=&quot;font-size: 50px;&quot;&gt;&lt;b&gt;&lt;i&gt;Smart Camera Sequence Diagram&lt;/i&gt;&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fillColor=#eeeeee;strokeColor=#36393d;" parent="FufYKLiBR9uRMzQ89UV5-1" vertex="1">
+                    <mxGeometry x="10" y="40" width="830" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-18" value="" style="group" vertex="1" connectable="0" parent="FufYKLiBR9uRMzQ89UV5-1">
+                    <mxGeometry x="70" y="120" width="710" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-0" value="" style="group" vertex="1" connectable="0" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry x="480.19323671497585" y="77.61194029850748" width="77.17391304347827" height="71.64179104477611" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-1" value="" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.cpu;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-0">
+                    <mxGeometry y="17.91044776119403" width="77.17391304347827" height="53.73134328358209" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-2" value="ESP32" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-0">
+                    <mxGeometry x="8.57487922705314" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-3" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.camera2;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry x="643.1159420289855" y="103.88059701492536" width="41.03084577114428" height="32.61426202321725" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-4" value="" style="endArrow=none;startArrow=none;endFill=0;startFill=0;endSize=8;html=1;verticalAlign=bottom;labelBackgroundColor=none;strokeWidth=3;" edge="1" parent="mEkVm-5Oto3uDs2EURMD-18" source="mEkVm-5Oto3uDs2EURMD-1" target="mEkVm-5Oto3uDs2EURMD-3">
+                    <mxGeometry width="160" relative="1" as="geometry">
+                        <mxPoint x="497.3429951690821" y="125.37313432835822" as="sourcePoint"/>
+                        <mxPoint x="634.5410628019323" y="125.37313432835822" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-5" value="" style="image;points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image=img/lib/allied_telesis/computer_and_terminals/Server_Desktop.svg;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry x="197.2222222222222" y="91.9402985074627" width="34.029300165837476" height="43.13499170812603" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-6" value="move motros (L\R\Up\Down)" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;" edge="1" parent="mEkVm-5Oto3uDs2EURMD-18" source="mEkVm-5Oto3uDs2EURMD-5" target="mEkVm-5Oto3uDs2EURMD-1">
+                    <mxGeometry width="160" relative="1" as="geometry">
+                        <mxPoint x="342.99516908212564" y="115.9940298507463" as="sourcePoint"/>
+                        <mxPoint x="480.19323671497585" y="115.9940298507463" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-7" value="Send Image via HTTP" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;entryX=0.943;entryY=0.687;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry x="0.0299" y="25" width="160" relative="1" as="geometry">
+                        <mxPoint x="479.18997584541074" y="137.11602758219755" as="sourcePoint"/>
+                        <mxPoint x="249.5312750000001" y="131.34567164179103" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-8" value="" style="points=[[0.13,0.24,0],[0.5,0.2,0],[0.62,0,0],[0.87,0.24,0],[0.95,0.55,0],[0.96,0.95,0],[0.5,1,0],[0.04,0.95,0],[0.05,0.55,0]];verticalLabelPosition=bottom;sketch=0;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco19.joystick_keyboard;fillColor=#005073;strokeColor=none;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry y="104.14328358208957" width="38.92669983416253" height="21.625359867330015" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-9" value="" style="endArrow=classic;html=1;exitX=0.95;exitY=0.55;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="mEkVm-5Oto3uDs2EURMD-18" source="mEkVm-5Oto3uDs2EURMD-8">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="154.34782608695653" y="149.2537313432836" as="sourcePoint"/>
+                        <mxPoint x="197.2222222222222" y="119.40298507462687" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-10" value="Move motors via Joystick" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="mEkVm-5Oto3uDs2EURMD-9">
+                    <mxGeometry x="-0.2329" y="2" relative="1" as="geometry">
+                        <mxPoint x="19" y="-16" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-11" value="Runs Image Recognition Algorithm.&lt;br&gt;&lt;br&gt;When detects movement, moves the camera towards the object" style="shape=note2;boundedLbl=1;whiteSpace=wrap;html=1;size=25;verticalAlign=top;align=center;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry x="145.77294685990339" width="164.93780193236714" height="77.61194029850748" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-12" value="" style="endArrow=none;dashed=1;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.577;exitY=-0.045;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="mEkVm-5Oto3uDs2EURMD-18" source="mEkVm-5Oto3uDs2EURMD-5" target="mEkVm-5Oto3uDs2EURMD-11">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="180.07246376811597" y="155.22388059701495" as="sourcePoint"/>
+                        <mxPoint x="222.9468599033816" y="125.37313432835822" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-13" value="Note: to use Joystick make sure the automatic motor control is detached" style="shape=note2;boundedLbl=1;whiteSpace=wrap;html=1;size=25;verticalAlign=top;align=center;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry x="51.44927536231884" y="146.26865671641792" width="145.77294685990339" height="53.73134328358209" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-14" value="" style="endArrow=none;dashed=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="mEkVm-5Oto3uDs2EURMD-18" source="mEkVm-5Oto3uDs2EURMD-13">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="120.04830917874396" y="155.22388059701495" as="sourcePoint"/>
+                        <mxPoint x="128.62318840579712" y="119.40298507462687" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-15" value="HTTP over WIFI" style="shape=note2;boundedLbl=1;whiteSpace=wrap;html=1;size=25;verticalAlign=top;align=center;" vertex="1" parent="mEkVm-5Oto3uDs2EURMD-18">
+                    <mxGeometry x="360.14492753623193" y="161.19402985074626" width="102.89855072463769" height="35.82089552238806" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-16" value="" style="endArrow=none;dashed=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="mEkVm-5Oto3uDs2EURMD-18" source="mEkVm-5Oto3uDs2EURMD-15">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="274.3961352657005" y="101.49253731343283" as="sourcePoint"/>
+                        <mxPoint x="437.3188405797101" y="137.3134328358209" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-19" value="Lifeline1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="FufYKLiBR9uRMzQ89UV5-1">
+                    <mxGeometry x="290" y="380" width="100" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-20" value="Lifeline2" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="FufYKLiBR9uRMzQ89UV5-1">
+                    <mxGeometry x="410" y="380" width="100" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-21" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="FufYKLiBR9uRMzQ89UV5-1">
+                    <mxGeometry x="30" y="390" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="mEkVm-5Oto3uDs2EURMD-22" value="TODO:&amp;nbsp;&lt;div&gt;Should i use MVC architecture?&lt;/div&gt;" style="shape=note2;boundedLbl=1;whiteSpace=wrap;html=1;size=25;verticalAlign=top;align=center;" vertex="1" parent="FufYKLiBR9uRMzQ89UV5-1">
+                    <mxGeometry x="100" y="420" width="140" height="120" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="Class Diagram" id="3lP1v_68iZoFBjzAegB2">
+        <mxGraphModel dx="1282" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="yjvkg5CYwwfLX_GxFtE7-0"/>
+                <mxCell id="yjvkg5CYwwfLX_GxFtE7-1" parent="yjvkg5CYwwfLX_GxFtE7-0"/>
+                <mxCell id="yjvkg5CYwwfLX_GxFtE7-2" value="&lt;span style=&quot;font-size: 50px;&quot;&gt;&lt;b&gt;&lt;i&gt;Smart Camera Class Diagram&lt;/i&gt;&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fillColor=#eeeeee;strokeColor=#36393d;" parent="yjvkg5CYwwfLX_GxFtE7-1" vertex="1">
+                    <mxGeometry x="65" y="40" width="720" height="70" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="E97_K-zkhbB0F6bG3nSf" name="State Machine Diagram">
+        <mxGraphModel dx="2132" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="Wy3LAb1nEwGqhdP3kG4z-1" value="&lt;span style=&quot;font-size: 50px;&quot;&gt;&lt;b&gt;&lt;i&gt;Smart Camera State Machine Diagram&lt;/i&gt;&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fillColor=#eeeeee;strokeColor=#36393d;" vertex="1" parent="1">
+                    <mxGeometry x="-40" y="40" width="930" height="70" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
