@@ -222,3 +222,13 @@ pyrightconfig.json
 .history
 .ionide
 
+
+
+#* My .gitignore files
+secrets.h
+
+#! Remove files to upload them to GitHub
+README
+Code_Standards.md
+/src/ESP32/README.md
+.vscode
