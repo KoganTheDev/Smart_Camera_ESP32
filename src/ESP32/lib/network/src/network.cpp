@@ -1,5 +1,3 @@
-#pragma once
-
 #include "network.h"
 
 void connect_to_WIFI(String ssid, String password)
