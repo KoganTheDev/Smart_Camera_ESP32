@@ -26,8 +26,8 @@ jobs:
                    --suppress=missingIncludeSystem \
                    --error-exitcode=1 \
                    --force \
-                   -r src/ESP32/src/ \
-                   -r src/ESP32/lib/ \
+                   src/ESP32/src/ \
+                   src/ESP32/lib/ \
                    -I src/ESP32/include/ \
                    -I src/ESP32/src/ \
                    -I src/ESP32/lib/
