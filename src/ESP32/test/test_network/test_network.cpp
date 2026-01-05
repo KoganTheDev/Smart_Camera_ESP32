@@ -33,10 +33,3 @@ bool Network::is_connected() {
 String Network::get_ip() {
     return WiFi.localIP().toString();
 }
-
-void Network::handle_reconnect() {
-    if (WiFi.status() != WL_CONNECTED) {
-        // Since setAutoReconnect is true, we usually don't need manual logic,
-        // but you can add a WiFi.begin() here if it gets stuck.
-    }
-}

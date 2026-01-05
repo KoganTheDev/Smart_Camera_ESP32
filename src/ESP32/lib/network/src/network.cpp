@@ -3,7 +3,8 @@
 #include "secrets.h"
 
 
-bool Network::connect(String ssid, String password, uint32_t timeout_ms) {
+bool Network::connect(String ssid, String password, uint32_t timeout_ms)
+{
     Serial.printf("Connecting to: %s\n", ssid);
     
     WiFi.mode(WIFI_STA); // Enter Station mode
@@ -23,7 +24,8 @@ bool Network::connect(String ssid, String password, uint32_t timeout_ms) {
         Serial.println("\nWiFi Connected");
         Serial.printf("IP: %s\n", get_ip().c_str());
         return true;
-    }else
+    }
+    else
     {
         Serial.println("\nWiFi Connection Failed (Timeout)");
         return false;

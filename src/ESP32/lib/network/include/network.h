@@ -20,9 +20,4 @@ public:
      * @brief Returns the local IP address as a string.
      */
     static String get_ip();
-    
-    /**
-     * @brief Maintains connection. Call this occasionally if not using auto-reconnect.
-     */
-    static void handle_reconnect();
 };
