@@ -226,6 +226,7 @@ pyrightconfig.json
 
 #* My .gitignore files
 secrets.h
+!/src/ESP32/lib
 
 #! Remove files to upload them to GitHub
 README
