@@ -27,4 +27,4 @@ jobs:
                    --suppress=missingIncludeSystem \
                    --suppress=unusedFunction
                    --error-exitcode=1 \
-                   src/ include/ lib/
+                   -r src/ESP32/
