@@ -1,4 +1,4 @@
-name: "Clang-Tidy Analysis"
+name: Cppcheck Static Analysis
 
 on:
   push:
@@ -7,26 +7,24 @@ on:
     branches: [ main, master ]
 
 jobs:
-  static-analysis:
+  cppcheck:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Cache PlatformIO
-        uses: actions/cache@v3
-        with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-pio
+      - name: Install Cppcheck
+        run: sudo apt-get install -y cppcheck
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Install PlatformIO
-        run: pip install -U platformio
-
-      - name: Run Clang-Tidy
-        run: pio check --check-tool=clang-tidy --fail-on-check
+      - name: Run Cppcheck
+        run: |
+          # --enable=all: Enable all checks (style, performance, portability, etc)
+          # --suppress=missingIncludeSystem: Don't error out if Arduino.h isn't found
+          # --error-exitcode=1: Make the build fail if a bug is found
+          # --inline-suppr: Allows you to hide warnings in the code using comments
+          cppcheck --enable=all \
+                   --inline-suppr \
+                   --suppress=missingIncludeSystem \
+                   --suppress=unusedFunction
+                   --error-exitcode=1 \
+                   src/ include/ lib/
