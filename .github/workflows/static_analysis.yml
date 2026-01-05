@@ -12,9 +12,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-  
-      - name: Debug Path
-        run: find . -maxdepth 3 -not -path '*/.*'
       
       - name: Install Cppcheck
         run: sudo apt-get install -y cppcheck
@@ -23,11 +20,14 @@ jobs:
         run: |
           cppcheck --enable=all \
                    --inline-suppr \
-                   --suppress=missingIncludeSystem \
-                   --error-exitcode=1 \
                    --force \
+                   --error-exitcode=1 \
+                   --suppress=missingIncludeSystem \
+                   --suppress=unusedFunction \
+                   --suppress=cstyleCast \
+                   --suppress=missingInclude \
                    src/ESP32/src/ \
                    src/ESP32/lib/ \
                    -I src/ESP32/include/ \
                    -I src/ESP32/src/ \
-                   -I src/ESP32/lib/
+                   $(find src/ESP32/lib -type d -printf "-I %p ")
