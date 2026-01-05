@@ -12,7 +12,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
+  
+      - name: Debug Path
+        run: find . -maxdepth 3 -not -path '*/.*'
+      
       - name: Install Cppcheck
         run: sudo apt-get install -y cppcheck
 
