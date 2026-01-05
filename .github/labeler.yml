@@ -1,0 +1,30 @@
+"area: camera":
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'src/camera/**/*'
+      - 'include/camera/**/*'
+      - 'src/camera_diff_detection.*'
+
+"area: network":
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'src/network/**/*'
+      - 'include/network/**/*'
+      - 'src/turret_server.*'
+
+"area: logic":
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'src/controller/**/*'
+      - 'src/controller.*'
+
+"type: documentation":
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'README.md'
+      - 'docs/**/*'
+
+"type: testing":
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'test/**/*'
