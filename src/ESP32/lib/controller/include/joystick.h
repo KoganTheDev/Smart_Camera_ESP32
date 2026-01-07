@@ -1,10 +1,16 @@
+/**
+ * @file Joystick.h
+ * @brief Driver for the HW-504 Analog 2-Axis Joystick.
+ * @details Implements center-point auto-calibration and deadzone filtering 
+ * to handle mechanical drift and noise in 12-bit ADC readings.
+ */
+
 #pragma once
 
-// This header is used for the HW-504 joystick
+#include <cstdint>
 
-#include <stdlib.h>
-
-#define JOYSTICK_DEADZONE 150 // Used for joystick's sensitivity
+/** @brief Default sensitivity threshold to filter out analog noise at rest. */
+#define JOYSTICK_DEADZONE 150 
 
 /**
  * @class Joystick
@@ -13,10 +19,9 @@
 class Joystick
 {
 private:
-    uint8_t _pin_x, _pin_y;
-    int _deadzone;
-    int _center_x, _center_y;
-
+    uint8_t _pin_x, _pin_y; /**< GPIO pins assigned to X and Y axes. */
+    int _deadzone;          /**< Minimum deflection required to trigger movement. */
+    int _center_x, _center_y; /**< Calibrated neutral positions. */
 
     /**
      * @brief Internal helper to process raw ADC data against the center point.
@@ -24,17 +29,17 @@ private:
      * @param center The calibrated center value for that pin.
      * @return Offset value from center, or 0 if within deadzone.
      */
-    int read_axis(int pin, int center);    
+    int _read_axis(int pin, int center);    
 
 public:
     /**
      * @brief Construct a new Joystick object.
-     * @param pin_x ADC1-capable GPIO for the X-axis.
-     * @param pin_y ADC1-capable GPIO for the Y-axis.
+     * @param pin_x ADC1-capable GPIO for the X-axis
+     * @param pin_y ADC1-capable GPIO for the Y-axis
      * @param deadzone Sensitivity threshold (default: 150).
      */
     Joystick(uint8_t pin_x, uint8_t pin_y, int deadzone = JOYSTICK_DEADZONE) :
-    _pin_x(pin_x), _pin_y(pin_y), _deadzone(deadzone), _center_x(0), _center_y(0)  {};
+    _pin_x(pin_x), _pin_y(pin_y), _deadzone(deadzone), _center_x(0), _center_y(0) {};
 
     /**
      * @brief Initializes pins and performs auto-calibration of the center point.
@@ -42,11 +47,17 @@ public:
      */
     void begin();
 
-    /** @return Current relative X-axis position (-2048 to 2048). */
-    const int get_x() { return read_axis(this->_pin_x, this->_center_x); }
+    /** 
+     * @brief Gets the current raw deflection on the X-axis.
+     * @return Current relative X-axis position (-2048 to 2048). 
+     */
+    const int get_x() { return this->_read_axis(this->_pin_x, this->_center_x); }
 
-    /** @return Current relative Y-axis position (-2048 to 2048). */
-    const int get_y() { return read_axis(this->_pin_y, this->_center_y); }
+    /**
+     * @brief Gets the current raw deflection on the Y-axis.
+     * @return Current relative Y-axis position (-2048 to 2048). 
+     */
+    const int get_y() { return this->_read_axis(this->_pin_y, this->_center_y); }
 
     /**
      * @brief Scales the current X deflection to a specific output range.

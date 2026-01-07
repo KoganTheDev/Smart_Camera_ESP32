@@ -15,7 +15,7 @@ void Joystick::begin()
     this->_center_y = analogRead(this->_pin_y);
 }
 
-int Joystick::read_axis(int pin, int center)
+int Joystick::_read_axis(int pin, int center)
 {
     int raw_val = analogRead(pin);
     int delta = raw_val - center;

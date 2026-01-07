@@ -7,6 +7,11 @@ CameraDiffDetection::~CameraDiffDetection()
 {
 }
 
+std::tuple<MoveDirectionX, MoveDirectionY> detect_object(camera_fb_t* frame)
+{
+    // TODO: implement using the motion detection algorithm
+}
+
 
 void CameraDiffDetection::roberts_cross(camera_fb_t* frame, uint8_t* output_edges)
 {

@@ -10,13 +10,13 @@ namespace Turret
     void Servo::attach(int pin)
     {
         this->_servo.attach(pin);
-        this->_servo.write(_current_angle); // Start at center
+        this->_servo.write(this->_current_angle); // Start at center
     }
 
     void Servo::set_target(int angle)
     {
         // Constrain the target to protect your hardware/wires
-        this->_target_angle = constrain(angle, _min_angle, _max_angle);
+        this->_target_angle = constrain(angle, this->_min_angle, this->_max_angle);
     }
 
     void Servo::set_speed(int speed)
@@ -26,7 +26,7 @@ namespace Turret
 
     void Servo::set_position_raw(int angle)
     {
-        this->_current_angle = constrain(angle, _min_angle, _max_angle);
+        this->_current_angle = constrain(angle, this->_min_angle, this->_max_angle);
         this->_target_angle = this->_current_angle;
         this->_servo.write(this->_current_angle);
     }
@@ -48,7 +48,7 @@ namespace Turret
                     this->_current_angle--;
                 }
 
-                _servo.write(this->_current_angle);
+                this->_servo.write(this->_current_angle);
                 this->_last_move_time = millis();
             }
         }

@@ -1,41 +1,39 @@
+/**
+ * @file Controller.h
+ * @brief Header file for the Controller class.
+*/
 #pragma once
 
 #include <stdlib.h>
 #include <tuple>
+#include <cstdint>
+#include "move_types.h"
 
-
-enum class MoveDirectionX : uint8_t { None = 0, Right = 1, Left = 2 };
-enum class MoveDirectionY : uint8_t { None = 0, Up = 1, Down = 2 };
-
-inline bool operator!(MoveDirectionX dir) {
-    return dir == MoveDirectionX::None;
-}
-
-
-inline constexpr uint8_t operator+(MoveDirectionX dir) {
-    return static_cast<uint8_t>(dir);
-}
-
-
-inline bool operator!(MoveDirectionY dir) {
-    return dir == MoveDirectionY::None;
-}
-
-inline constexpr uint8_t operator+(MoveDirectionY dir) {
-    return static_cast<uint8_t>(dir);
-}
-
-
+/**
+ * @class Controller
+ * @brief Handles logic for object detection and movement calculations.
+ */
 class Controller
 {
 private:
-    uint8_t x;
-    uint8_t y;
+    uint8_t _x; /**< Internal x-coordinate state or threshold */
+    uint8_t _y; /**< Internal y-coordinate state or threshold */
+
 public:
-    Controller(uint8_t x, uint8_t y) : x(x), y(y) {}
+    /**
+     * @brief Construct a new Controller object.
+     * @param x Initial x-coordinate or horizontal sensitivity.
+     * @param y Initial y-coordinate or vertical sensitivity.
+     */
+    Controller(uint8_t x, uint8_t y) : _x(x), _y(y) {}
+
+    /** @brief Destroy the Controller object. */
     ~Controller();
 
+    /**
+     * @brief Analyzes a location to determine required movement directions.
+     * @param current_location A tuple containing the {x, y} coordinates of the detected object.
+     * @return std::tuple<MoveDirectionX, MoveDirectionY> The calculated directions to move.
+     */
     std::tuple<MoveDirectionX, MoveDirectionY> detect_object(std::tuple<uint8_t, uint8_t> current_location);
-
 };
-
