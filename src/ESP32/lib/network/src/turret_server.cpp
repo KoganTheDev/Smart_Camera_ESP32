@@ -17,15 +17,6 @@ bool HttpServer::start(Camera* camera) {
 
     if (httpd_start(&this->_server_handle, &config) == ESP_OK)
     {
-        // Define Root Route
-        httpd_uri_t index_uri = {
-        .uri       = "/",
-        .method    = HTTP_GET,
-        .handler   = index_handler,
-        .user_ctx  = NULL
-        };
-        httpd_register_uri_handler(this->_server_handle, &index_uri);
-
         // Define the Video Stream Route
         httpd_uri_t stream_uri = {
             .uri       = "/stream",
@@ -58,13 +49,8 @@ void HttpServer::stop()
     }
 }
 
-esp_err_t HttpServer::index_handler(httpd_req_t *req)
-{
-    return httpd_resp_send(req, HTML_PAGE, HTTPD_RESP_USE_STRLEN);
-}
 
-esp_err_t HttpServer::stream_handler(httpd_req_t *req)
-{
+esp_err_t HttpServer::stream_handler(httpd_req_t *req) {
     camera_fb_t * fb = NULL;
     esp_err_t res = ESP_OK;
     size_t _jpg_buf_len = 0;

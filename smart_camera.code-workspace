@@ -7,7 +7,5 @@
 			"path": "src/ESP32"
 		}
 	],
-    "settings": {
-        "liveServer.settings.multiRootWorkspaceName": "Smart_Camera_ESP32"
-    }
+    "settings": {}
 }
