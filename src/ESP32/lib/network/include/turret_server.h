@@ -38,6 +38,17 @@ public:
     void stop();
 
     /**
+     * @brief HTTP handler for the root ("/") URI.
+     * This method is called by the ESP HTTP server whenever a client accesses the 
+     * root IP address. It serves the primary web interface stored in Flash memory.
+     * @param req Pointer to the HTTP request object containing session data.
+     * @return esp_err_t Returns ESP_OK if the response was sent successfully, 
+     * otherwise returns an error code from the underlying HTTP server.
+     * @see index_html.h
+     */
+    static esp_err_t index_handler(httpd_req_t *req);
+
+    /**
      * @brief HTTP GET Handler for the MJPEG stream.
      * @details Continuously captures frames from the camera and pushes them 
      * to the client using "multipart/x-mixed-replace".
