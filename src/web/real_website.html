@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Turret Control</title>
+    <style>
+        /**
+         * @name TurretTheme
+         * @brief Defines CSS variables for state-based styling (Locked, AI, Manual).
+         */
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-color: #2d2d2d;
+            --accent-color: #ff6b00;
+            --text-color: #ffffff;
+            --safe-color: #444;
+            --locked-color: #ff0000;
+            --ai-color: #00d4ff;
+        }
+
+        html, body { 
+            overflow: hidden; 
+            overscroll-behavior: none; 
+            height: 100%;
+            width: 100%;
+            position: fixed;
+        }
+
+        body { 
+            margin: 0; padding: 10px;
+            background: var(--bg-color); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            color: var(--text-color);
+            display: flex; justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column; 
+            gap: 10px;
+            max-width: 1000px;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .container { flex-direction: row; align-items: flex-start; gap: 20px; }
+        }
+
+        .video-box {
+            flex: 1;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--panel-color);
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .video-box img { width: 100%; height: auto; display: block; }
+
+        /**
+         * @brief Visual alert for active target locking.
+         */
+        .lock-indicator {
+            position: absolute; top: 10px; right: 10px;
+            padding: 6px 12px; border-radius: 8px;
+            background: rgba(0,0,0,0.7); border: 2px solid var(--safe-color);
+            font-weight: bold; font-size: 0.7rem; z-index: 10;
+        }
+        .lock-indicator.locked { border-color: var(--locked-color); color: var(--locked-color); animation: blink 0.5s infinite; }
+
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .controls {
+            flex-shrink: 0;
+            background: var(--panel-color);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 12px;
+        }
+
+        .mode-badge {
+            width: 100%; text-align: center; padding: 6px;
+            border-radius: 6px; background: #1a1a1a;
+            font-size: 0.7rem; letter-spacing: 1px; font-weight: bold;
+        }
+        .mode-badge.ai { border: 1px solid var(--ai-color); color: var(--ai-color); }
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 55px);
+            grid-template-rows: repeat(3, 55px);
+            gap: 8px;
+        }
+
+        .btn {
+            width: 55px; height: 55px;
+            background: #444; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; fill: white;
+            transition: transform 0.05s;
+        }
+        .btn:active { background: var(--accent-color); transform: scale(0.92); }
+        .btn svg { width: 24px; height: 24px; }
+
+        .up { grid-column: 2; grid-row: 1; }
+        .left { grid-column: 1; grid-row: 2; }
+        .right { grid-column: 3; grid-row: 2; }
+        .down { grid-column: 2; grid-row: 3; }
+
+        .shoot-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #ff4500, #b22222);
+            border: none; border-radius: 50px;
+            color: white; font-weight: bold; font-size: 1rem;
+            cursor: pointer; text-transform: uppercase;
+        }
+        .shoot-btn:active { transform: scale(0.96); opacity: 0.9; }
+
+        #status { font-size: 0.65rem; opacity: 0.4; margin-top: -5px; }
+    </style>
+</head>
+<body oncontextmenu="return false;"> 
+    <div class="container">
+        <div class="video-box">
+            <div id="lockLabel" class="lock-indicator">NO TARGET</div>
+            <img src="/stream" alt="Live Stream">
+        </div>
+
+        <div class="controls">
+            <div id="modeBadge" class="mode-badge">MANUAL MODE</div>
+
+            <div class="d-pad">
+                <div class="btn up" onclick="sendMove('up')"><svg viewBox="0 0 24 24"><path d="M12 4l-9 10h18l-9-10z"/></svg></div>
+                <div class="btn left" onclick="sendMove('left')"><svg viewBox="0 0 24 24"><path d="M4 12l10 9v-18l-10 9z"/></svg></div>
+                <div class="btn right" onclick="sendMove('right')"><svg viewBox="0 0 24 24"><path d="M20 12l-10-9v18l10-9z"/></svg></div>
+                <div class="btn down" onclick="sendMove('down')"><svg viewBox="0 0 24 24"><path d="M12 20l9-10h-18l9 10z"/></svg></div>
+            </div>
+
+            <button class="shoot-btn" onclick="fetch('/shoot')">FIRE</button>
+            <div id="status">IP: LOADING...</div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * @brief Sends a GET request for turret movement.
+         * @param dir Direction string.
+         */
+        function sendMove(dir) { fetch(`/move?dir=${dir}`); }
+
+        /**
+         * @brief Updates the UI state markers.
+         * @param isLocked Active target lock boolean.
+         * @param isAI Autonomous mode boolean.
+         */
+        function updateTurretStatus(isLocked, isAI) {
+            const lockEl = document.getElementById('lockLabel');
+            const modeEl = document.getElementById('modeBadge');
+            lockEl.innerText = isLocked ? "LOCKED" : "NO TARGET";
+            isLocked ? lockEl.classList.add('locked') : lockEl.classList.remove('locked');
+            modeEl.innerText = isAI ? "AI AUTO-TRACK" : "MANUAL MODE";
+            isAI ? modeEl.classList.add('ai') : modeEl.classList.remove('ai');
+        }
+
+        window.onload = () => {
+            const host = window.location.hostname || window.location.host || "Local";
+            document.getElementById('status').innerText = "IP: " + host;
+        };
+    </script>
+</body>
+</html>
