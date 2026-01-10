@@ -1,39 +1,64 @@
 /**
  * @file Controller.h
  * @brief Header file for the Controller class.
-*/
+ * @details This class serves as the central brain of the turret system, 
+ * coordinating input from the joystick, data from the detection module, 
+ * and executing commands via the movement manager.
+ */
 #pragma once
 
 #include <stdlib.h>
 #include <tuple>
 #include <cstdint>
 #include "move_types.h"
+#include "joystick.h"
+#include "base_movement_manager.h"
+#include "base_detection_module.h"
 
 /**
  * @class Controller
  * @brief Handles logic for object detection and movement calculations.
+ * details The Controller class implements the main control loop. It arbitrates 
+ * between manual joystick input and autonomous detection tracking, ensuring 
+ * that the BaseMovementManager receives the correct vector for the turret motors.
  */
 class Controller
 {
 private:
-    uint8_t _x; /**< Internal x-coordinate state or threshold */
-    uint8_t _y; /**< Internal y-coordinate state or threshold */
+    /** @brief Reference to the hardware abstraction for motor control. */
+    BaseMovementManager& _movement_manager;
+
+    /** @brief Reference to the AI/Computer Vision module for target acquisition. */
+    BaseDetectionModule& _detection_module;
+
+    /** @brief Reference to the physical or virtual joystick input handler. */
+    Joystick& _joystick;
 
 public:
+    
     /**
      * @brief Construct a new Controller object.
-     * @param x Initial x-coordinate or horizontal sensitivity.
-     * @param y Initial y-coordinate or vertical sensitivity.
+     * @param movement_manager Reference to an implementation of BaseMovementManager.
+     * @param detection_module Reference to an implementation of BaseDetectionModule.
+     * @param joystick Reference to the Joystick input handler.
      */
-    Controller(uint8_t x, uint8_t y) : _x(x), _y(y) {}
+    Controller(BaseMovementManager& movement_manager, BaseDetectionModule& detection_module, Joystick& joystick) :
+        _movement_manager(movement_manager),
+        _detection_module(detection_module),
+        _joystick(joystick)
+        {}
 
-    /** @brief Destroy the Controller object. */
-    ~Controller();
+    /** 
+     * @brief Destroy the Controller object. 
+     * @details Ensures all movement is halted and resources are released safely.
+     */
+    ~Controller() {}
 
     /**
-     * @brief Analyzes a location to determine required movement directions.
-     * @param current_location A tuple containing the {x, y} coordinates of the detected object.
-     * @return std::tuple<MoveDirectionX, MoveDirectionY> The calculated directions to move.
+     * @brief Main execution loop for the turret system.
+     * @details When called, this method polls the detection module for targets 
+     * and the joystick for user input. It calculates the necessary PWM or 
+     * step values and updates the movement manager state.
      */
-    std::tuple<MoveDirectionX, MoveDirectionY> detect_object(std::tuple<uint8_t, uint8_t> current_location);
+    void run();
 };

@@ -29,21 +29,45 @@ enum class MoveDirectionY : uint8_t {
 };
 
 /** @brief Logical NOT operator for MoveDirectionX. Returns true if direction is None. */
-inline bool operator!(MoveDirectionX dir) {
-    return dir == MoveDirectionX::None;
+inline bool operator!(MoveDirectionX direction) {
+    return direction == MoveDirectionX::None;
 }
 
 /** @brief Unary plus operator to cast MoveDirectionX to its underlying uint8_t value. */
-inline constexpr uint8_t operator+(MoveDirectionX dir) {
-    return static_cast<uint8_t>(dir);
+inline constexpr uint8_t operator+(MoveDirectionX direction) {
+    return static_cast<uint8_t>(direction);
 }
 
 /** @brief Logical NOT operator for MoveDirectionY. Returns true if direction is None. */
-inline bool operator!(MoveDirectionY dir) {
-    return dir == MoveDirectionY::None;
+inline bool operator!(MoveDirectionY direction) {
+    return direction == MoveDirectionY::None;
 }
 
 /** @brief Unary plus operator to cast MoveDirectionY to its underlying uint8_t value. */
-inline constexpr uint8_t operator+(MoveDirectionY dir) {
-    return static_cast<uint8_t>(dir);
+inline constexpr uint8_t operator+(MoveDirectionY direction) {
+    return static_cast<uint8_t>(direction);
+}
+
+/** @brief Converts MoveDirectionX to a human-readable string. */
+inline const char* moveDirectionXToString(MoveDirectionX direction)
+{
+    switch (direction)
+    {
+        case MoveDirectionX::None:  return "None";
+        case MoveDirectionX::Right: return "Right";
+        case MoveDirectionX::Left:  return "Left";
+        default:                    return "Unknown";
+    }
+}
+
+/** @brief Converts MoveDirectionY to a human-readable string. */
+inline const char* moveDirectionYToString(MoveDirectionY direction)
+{
+    switch (direction)
+    {
+        case MoveDirectionY::None: return "None";
+        case MoveDirectionY::Up:   return "Up";
+        case MoveDirectionY::Down: return "Down";
+        default:                   return "Unknown";
+    }
 }
