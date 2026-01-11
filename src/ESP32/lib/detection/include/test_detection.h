@@ -11,7 +11,8 @@
 class TestDetection : public BaseDetectionModule
 {
 private:
-    /* data */
+    static inline int print_limit = 0;
+
 public:
     TestDetection() {}
     ~TestDetection() {}
@@ -26,7 +27,11 @@ public:
         MoveDirectionX random_number_x = MoveDirectionX((rand() % (max - min + 1)) + min);
         MoveDirectionY random_number_y = MoveDirectionY((rand() % (max - min + 1)) + min);
 
-        Serial.print("x movement: ");
+        if (print_limit == 100)
+        {
+            print_limit = 0;
+
+            Serial.print("x movement: ");
         switch (random_number_x)
         {
         case MoveDirectionX::None:
@@ -65,11 +70,13 @@ public:
             break;
         }
 
-
         Serial.printf("Tuple returned (%d, %d)\n", random_number_x, random_number_y);
+        }
+        
+
+        print_limit++;
 
         return std::make_tuple(random_number_x, random_number_y);
     };
-
 };
 

@@ -26,7 +26,7 @@ private:
     Servo& _servo;
 
     static constexpr int _SERVO_INCREMENT = 5;
-    static constexpr int _STEP_INCREMENT = 500;
+    static constexpr int _STEP_INCREMENT = 5;
 
 
 

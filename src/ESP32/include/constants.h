@@ -3,8 +3,9 @@
 #define BAUDRATE 115200
 
 // --- Joystick Config ---
-#define JOYSTICK_PIN_X 18
-#define JOYSTICK_PIN_Y 19
+#define JOYSTICK_PIN_X 34  
+#define JOYSTICK_PIN_Y 35
+#define JOYSTICK_PIN_Z 32
 
 // --- Servo Config ---
 #define SERVO_PIN 15

@@ -14,6 +14,7 @@
 #include "joystick.h"
 #include "base_movement_manager.h"
 #include "base_detection_module.h"
+#include "system_control_types.h"
 
 /**
  * @class Controller
@@ -25,6 +26,8 @@
 class Controller
 {
 private:
+    SystemControl _system_control_state;
+
     /** @brief Reference to the hardware abstraction for motor control. */
     BaseMovementManager& _movement_manager;
 
@@ -46,7 +49,9 @@ public:
         _movement_manager(movement_manager),
         _detection_module(detection_module),
         _joystick(joystick)
-        {}
+        {
+            this->_system_control_state = SystemControl::AI_MODE;
+        }
 
     /** 
      * @brief Destroy the Controller object. 
