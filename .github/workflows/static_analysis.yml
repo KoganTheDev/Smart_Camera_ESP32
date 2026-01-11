@@ -21,27 +21,26 @@ jobs:
       - name: Setup Problem Matcher
         run: echo "::add-matcher::.github/cppcheck-matcher.json"
 
-      - name: Run Cppcheck Analysis
-        # We use 'continue-on-error' or '|| true' so the UI injection steps still run even if bugs are found
+      - name: Run Cppcheck
         run: |
           mkdir -p report
           
-          # 1. Console Output (for PR Annotations)
+          # 1. Output to console for GitHub Annotations (Human Readable)
           cppcheck --enable=all --inline-suppr --force --template=gcc \
                    --suppress=missingIncludeSystem --suppress=unusedFunction \
                    --suppress=cstyleCast --suppress=missingInclude \
                    src/ESP32/src/ src/ESP32/lib/ \
                    -I src/ESP32/include/ -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p ") || true
+                   $(find src/ESP32/lib -type d -printf "-I %p ")
 
-          # 2. XML Output (for HTML Report)
+          # 2. Output to XML for the HTML Dashboard
           cppcheck --enable=all --inline-suppr --force --xml --xml-version=2 \
                    --suppress=missingIncludeSystem --suppress=unusedFunction \
                    --suppress=cstyleCast --suppress=missingInclude \
                    src/ESP32/src/ src/ESP32/lib/ \
                    -I src/ESP32/include/ -I src/ESP32/src/ \
                    $(find src/ESP32/lib -type d -printf "-I %p ") \
-                   2> cppcheck_report.xml || true
+                   2> cppcheck_report.xml
 
           # 3. Generate the Dashboard
           cppcheck-htmlreport --file=cppcheck_report.xml \
@@ -49,32 +48,9 @@ jobs:
                               --source-dir=. \
                               --title="ESP32 Analysis Results"
 
-      - name: Modernize Report UI
-        run: |
-          # Injecting modern CSS and fonts into all generated HTML files
-          find report -name "*.html" -exec sed -i '/<head>/a \
-          <link rel="preconnect" href="https://fonts.googleapis.com"> \
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> \
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"> \
-          <style> \
-            body { font-family: "Inter", system-ui, sans-serif !important; background-color: #f9fafb !important; color: #111827 !important; padding: 30px !important; line-height: 1.5 !important; } \
-            table { border-collapse: separate !important; border-spacing: 0 !important; width: 100% !important; border: 1px solid #e5e7eb !important; border-radius: 12px !important; overflow: hidden !important; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important; background: white !important; margin-top: 20px !important; } \
-            th { background-color: #111827 !important; color: #ffffff !important; padding: 14px 16px !important; text-align: left !important; font-size: 0.875rem !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; } \
-            td { padding: 12px 16px !important; border-top: 1px solid #e5e7eb !important; font-size: 0.9rem !important; } \
-            tr:hover td { background-color: #f3f4f6 !important; } \
-            a { color: #2563eb !important; text-decoration: none !important; font-weight: 500 !important; } \
-            a:hover { text-decoration: underline !important; } \
-            pre { background: #0f172a !important; color: #f8fafc !important; padding: 20px !important; border-radius: 10px !important; overflow-x: auto !important; font-family: ui-monospace, monospace !important; font-size: 13px !important; } \
-            .highlight { background-color: #450a0a !important; display: block !important; width: 100% !important; border-left: 4px solid #ef4444 !important; } \
-            h1, h2 { color: #111827 !important; letter-spacing: -0.025em !important; } \
-            .error { color: #e11d48 !important; font-weight: bold !important; } \
-            .warning { color: #d97706 !important; font-weight: bold !important; } \
-          </style>' {} +
-
       - name: Upload HTML Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cppcheck-dashboard
           path: report/
-          retention-days: 14
