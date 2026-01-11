@@ -12,22 +12,39 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      
-      - name: Install Cppcheck
-        run: sudo apt-get install -y cppcheck
 
-      - name: Run Cppcheck
+      - name: Install Cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Run Cppcheck Analysis
+        # We output to XML for the HTML report and a text file for the Annotator
         run: |
-          cppcheck --enable=all \
-                   --inline-suppr \
-                   --force \
-                   --error-exitcode=1 \
-                   --suppress=missingIncludeSystem \
-                   --suppress=unusedFunction \
-                   --suppress=cstyleCast \
-                   --suppress=missingInclude \
-                   src/ESP32/src/ \
-                   src/ESP32/lib/ \
-                   -I src/ESP32/include/ \
-                   -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p ")
+          mkdir -p report
+          cppcheck --enable=all --inline-suppr --force --xml --xml-version=2 \
+                   --suppress=missingIncludeSystem --suppress=unusedFunction \
+                   --suppress=cstyleCast --suppress=missingInclude \
+                   src/ESP32/src/ src/ESP32/lib/ \
+                   -I src/ESP32/include/ -I src/ESP32/src/ \
+                   $(find src/ESP32/lib -type d -printf "-I %p ") \
+                   2> cppcheck_report.xml
+
+      - name: Generate HTML Report
+        run: |
+          cppcheck-htmlreport --file=cppcheck_report.xml \
+                              --report-dir=report \
+                              --source-dir=. \
+                              --title="ESP32 Analysis Results"
+
+      - name: Upload HTML Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppcheck-dashboard
+          path: report/
+
+      - name: Create GitHub Annotations
+        uses: cpp-linter/cppcheck-action@v2
+        with:
+          # This reads the XML we already generated and highlights the PR code
+          output_file: cppcheck_report.xml
+          # Set to 'true' if you want the build to fail on errors
+          fail_on_error: true
