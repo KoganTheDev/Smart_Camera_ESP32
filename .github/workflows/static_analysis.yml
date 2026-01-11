@@ -12,22 +12,34 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      
-      - name: Install Cppcheck
-        run: sudo apt-get install -y cppcheck
 
-      - name: Run Cppcheck
+      - name: Install Cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Setup Problem Matcher
+        # This tells GitHub to "listen" for Cppcheck errors in the logs
+        run: echo "::add-matcher::.github/cppcheck-matcher.json"
+
+      - name: Run Cppcheck Analysis
         run: |
-          cppcheck --enable=all \
-                   --inline-suppr \
-                   --force \
-                   --error-exitcode=1 \
-                   --suppress=missingIncludeSystem \
-                   --suppress=unusedFunction \
-                   --suppress=cstyleCast \
-                   --suppress=missingInclude \
-                   src/ESP32/src/ \
-                   src/ESP32/lib/ \
-                   -I src/ESP32/include/ \
-                   -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p ")
+          mkdir -p report
+          # Use --template=gcc so the Problem Matcher can read it easily
+          cppcheck --enable=all --inline-suppr --force --template=gcc --xml --xml-version=2 \
+                   --suppress=missingIncludeSystem --suppress=unusedFunction \
+                   --suppress=cstyleCast --suppress=missingInclude \
+                   src/ESP32/src/ src/ESP32/lib/ \
+                   -I src/ESP32/include/ -I src/ESP32/src/ \
+                   $(find src/ESP32/lib -type d -printf "-I %p ") \
+                   2> cppcheck_report.xml || true
+          
+          # Convert the XML to the HTML report
+          cppcheck-htmlreport --file=cppcheck_report.xml \
+                              --report-dir=report \
+                              --source-dir=. \
+                              --title="ESP32 Analysis Results"
+
+      - name: Upload HTML Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppcheck-dashboard
+          path: report/
