@@ -11,7 +11,8 @@
  * @namespace WroverPins
  * @brief GPIO mapping specifically for the ESP32-Wrover-kit.
  */
-namespace WroverPins {
+namespace WroverPins
+{
 /** @brief Power down pin; set to -1 if tied to ground/unused. */
 #define PWDN_GPIO_NUM -1
 /** @brief Hardware reset pin; set to -1 if managed by internal circuitry. */
@@ -46,65 +47,64 @@ namespace WroverPins {
  * @class Camera
  * @brief Manages camera initialization, frame capture, and memory lifecycle.
  */
-class Camera {
+class Camera
+{
 private:
-  camera_config_t
-      _config; ///< Internal structure holding ESP-Camera driver settings.
+    camera_config_t _config; ///< Internal structure holding ESP-Camera driver settings.
 
 public:
-  /**
-   * @brief Constructor: Initializes the default hardware configuration.
-   * @details Sets default values for QVGA resolution, JPEG format, and PSRAM
-   * usage.
-   */
-  Camera() {
-    _config.ledc_channel = LEDC_CHANNEL_0;
-    _config.ledc_timer = LEDC_TIMER_0;
-    _config.pin_d0 = Y2_GPIO_NUM;
-    _config.pin_d1 = Y3_GPIO_NUM;
-    _config.pin_d2 = Y4_GPIO_NUM;
-    _config.pin_d3 = Y5_GPIO_NUM;
-    _config.pin_d4 = Y6_GPIO_NUM;
-    _config.pin_d5 = Y7_GPIO_NUM;
-    _config.pin_d6 = Y8_GPIO_NUM;
-    _config.pin_d7 = Y9_GPIO_NUM;
-    _config.pin_xclk = XCLK_GPIO_NUM;
-    _config.pin_pclk = PCLK_GPIO_NUM;
-    _config.pin_vsync = VSYNC_GPIO_NUM;
-    _config.pin_href = HREF_GPIO_NUM;
-    _config.pin_sccb_sda = SIOD_GPIO_NUM;
-    _config.pin_sccb_scl = SIOC_GPIO_NUM;
-    _config.pin_pwdn = PWDN_GPIO_NUM;
-    _config.pin_reset = RESET_GPIO_NUM;
+    /**
+     * @brief Constructor: Initializes the default hardware configuration.
+     * @details Sets default values for QVGA resolution, JPEG format, and PSRAM
+     * usage.
+     */
+    Camera()
+    {
+        _config.ledc_channel = LEDC_CHANNEL_0;
+        _config.ledc_timer = LEDC_TIMER_0;
+        _config.pin_d0 = Y2_GPIO_NUM;
+        _config.pin_d1 = Y3_GPIO_NUM;
+        _config.pin_d2 = Y4_GPIO_NUM;
+        _config.pin_d3 = Y5_GPIO_NUM;
+        _config.pin_d4 = Y6_GPIO_NUM;
+        _config.pin_d5 = Y7_GPIO_NUM;
+        _config.pin_d6 = Y8_GPIO_NUM;
+        _config.pin_d7 = Y9_GPIO_NUM;
+        _config.pin_xclk = XCLK_GPIO_NUM;
+        _config.pin_pclk = PCLK_GPIO_NUM;
+        _config.pin_vsync = VSYNC_GPIO_NUM;
+        _config.pin_href = HREF_GPIO_NUM;
+        _config.pin_sccb_sda = SIOD_GPIO_NUM;
+        _config.pin_sccb_scl = SIOC_GPIO_NUM;
+        _config.pin_pwdn = PWDN_GPIO_NUM;
+        _config.pin_reset = RESET_GPIO_NUM;
 
-    _config.xclk_freq_hz = 20000000;       // 20MHz for stable image
-    _config.pixel_format = PIXFORMAT_JPEG; // Compression for network throughput
-    _config.frame_size =
-        FRAMESIZE_QVGA;        // 320x240: Balance between AI speed and detail
-    _config.jpeg_quality = 12; // 0-63 (lower is better quality)
-    _config.fb_count = 2;      // Double buffering to prevent frame tearing
-    _config.fb_location = CAMERA_FB_IN_PSRAM;
-    _config.grab_mode =
-        CAMERA_GRAB_LATEST; // Drops old frames to reduce latency
-  }
+        _config.xclk_freq_hz = 20000000;       // 20MHz for stable image
+        _config.pixel_format = PIXFORMAT_JPEG; // Compression for network throughput
+        _config.frame_size = FRAMESIZE_QVGA;   // 320x240: Balance between AI speed and detail
+        _config.jpeg_quality = 12;             // 0-63 (lower is better quality)
+        _config.fb_count = 2;                  // Double buffering to prevent frame tearing
+        _config.fb_location = CAMERA_FB_IN_PSRAM;
+        _config.grab_mode = CAMERA_GRAB_LATEST; // Drops old frames to reduce latency
+    }
 
-  /**
-   * @brief Initializes the sensor and allocates memory for the frame buffer.
-   * @return true if initialization succeeded, false if sensor not found or
-   * PSRAM failed.
-   */
-  bool begin();
+    /**
+     * @brief Initializes the sensor and allocates memory for the frame buffer.
+     * @return true if initialization succeeded, false if sensor not found or
+     * PSRAM failed.
+     */
+    bool begin();
 
-  /**
-   * @brief Captures a new image frame.
-   * @return camera_fb_t* Pointer to the frame buffer.
-   * @warning Must call release() after processing to avoid memory leaks.
-   */
-  camera_fb_t *capture();
+    /**
+     * @brief Captures a new image frame.
+     * @return camera_fb_t* Pointer to the frame buffer.
+     * @warning Must call release() after processing to avoid memory leaks.
+     */
+    camera_fb_t* capture();
 
-  /**
-   * @brief Returns the frame buffer to the driver to be reused.
-   * @param fb Pointer to the captured frame buffer.
-   */
-  void release(camera_fb_t *fb);
+    /**
+     * @brief Returns the frame buffer to the driver to be reused.
+     * @param fb Pointer to the captured frame buffer.
+     */
+    void release(camera_fb_t* fb);
 };

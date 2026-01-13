@@ -12,8 +12,7 @@
 #include "turret_server.h"
 
 Servo servo;
-Stepper stepper(STEPPER_NUMBER_OF_STEPS, STEPPER_PIN1, STEPPER_PIN3,
-                STEPPER_PIN2, STEPPER_PIN4);
+Stepper stepper(STEPPER_NUMBER_OF_STEPS, STEPPER_PIN1, STEPPER_PIN3, STEPPER_PIN2, STEPPER_PIN4);
 
 MovementManager movement_manager(stepper, servo);
 TestDetection detection_manager;
@@ -24,20 +23,22 @@ Controller controller(movement_manager, detection_manager, joystick);
 HttpServer http_server;
 static Camera camera;
 
-void setup() {
-  Serial.begin(BAUDRATE);
-  Serial.println("[Serial] === SMART TURRET START ===");
-  joystick.begin();
-  // camera.begin();
+void setup()
+{
+    Serial.begin(BAUDRATE);
+    Serial.println("[Serial] === SMART TURRET START ===");
+    joystick.begin();
+    // camera.begin();
 
-  WifiManager::connect(WIFI_SSID, WIFI_PASSWORD);
-  // http_server.start(&camera);
+    WifiManager::connect(WIFI_SSID, WIFI_PASSWORD);
+    // http_server.start(&camera);
 
-  servo.attach(SERVO_PIN);
-  stepper.setSpeed(STEPPER_SPEED);
+    servo.attach(SERVO_PIN);
+    stepper.setSpeed(STEPPER_SPEED);
 }
 
-void loop() {
-  controller.run();
-  WifiManager::maintain();
+void loop()
+{
+    controller.run();
+    WifiManager::maintain();
 }

@@ -16,20 +16,20 @@
  * the specific detection method (e.g., Color, AI, or Motion) by providing a
  * consistent interface.
  */
-class BaseDetectionModule {
+class BaseDetectionModule
+{
 public:
-  /**
-   * @brief Virtual destructor to ensure proper cleanup of derived classes.
-   */
-  virtual ~BaseDetectionModule() = default;
+    /**
+     * @brief Virtual destructor to ensure proper cleanup of derived classes.
+     */
+    virtual ~BaseDetectionModule() = default;
 
-  /**
-   * @brief Analyzes a camera frame to locate a specific object.
-   * @param frame Pointer to the ESP32-CAM frame buffer (camera_fb_t).
-   * @return std::tuple<uint8_t, uint8_t> Returns a tuple containing:
-   * - Index 0 (MoveDirectionX): Left | Right | Stay
-   * - Index 1 (MoveDirectionY): Up   | Down  | Stay
-   */
-  virtual std::tuple<MoveDirectionX, MoveDirectionY>
-  detect_object(camera_fb_t *frame) = 0;
+    /**
+     * @brief Analyzes a camera frame to locate a specific object.
+     * @param frame Pointer to the ESP32-CAM frame buffer (camera_fb_t).
+     * @return std::tuple<uint8_t, uint8_t> Returns a tuple containing:
+     * - Index 0 (MoveDirectionX): Left | Right | Stay
+     * - Index 1 (MoveDirectionY): Up   | Down  | Stay
+     */
+    virtual std::tuple<MoveDirectionX, MoveDirectionY> detect_object(camera_fb_t* frame) = 0;
 };

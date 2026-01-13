@@ -24,47 +24,47 @@
  * that the BaseMovementManager receives the correct vector for the turret
  * motors.
  */
-class Controller {
+class Controller
+{
 private:
-  SystemControl _system_control_state;
+    SystemControl _system_control_state;
 
-  /** @brief Reference to the hardware abstraction for motor control. */
-  BaseMovementManager &_movement_manager;
+    /** @brief Reference to the hardware abstraction for motor control. */
+    BaseMovementManager& _movement_manager;
 
-  /** @brief Reference to the AI/Computer Vision module for target acquisition.
-   */
-  BaseDetectionModule &_detection_module;
+    /** @brief Reference to the AI/Computer Vision module for target acquisition.
+     */
+    BaseDetectionModule& _detection_module;
 
-  /** @brief Reference to the physical or virtual joystick input handler. */
-  Joystick &_joystick;
+    /** @brief Reference to the physical or virtual joystick input handler. */
+    Joystick& _joystick;
 
 public:
-  /**
-   * @brief Construct a new Controller object.
-   * @param movement_manager Reference to an implementation of
-   * BaseMovementManager.
-   * @param detection_module Reference to an implementation of
-   * BaseDetectionModule.
-   * @param joystick Reference to the Joystick input handler.
-   */
-  Controller(BaseMovementManager &movement_manager,
-             BaseDetectionModule &detection_module, Joystick &joystick)
-      : _movement_manager(movement_manager),
-        _detection_module(detection_module), _joystick(joystick) {
-    this->_system_control_state = SystemControl::AI_MODE;
-  }
+    /**
+     * @brief Construct a new Controller object.
+     * @param movement_manager Reference to an implementation of
+     * BaseMovementManager.
+     * @param detection_module Reference to an implementation of
+     * BaseDetectionModule.
+     * @param joystick Reference to the Joystick input handler.
+     */
+    Controller(BaseMovementManager& movement_manager, BaseDetectionModule& detection_module, Joystick& joystick)
+        : _movement_manager(movement_manager), _detection_module(detection_module), _joystick(joystick)
+    {
+        this->_system_control_state = SystemControl::AI_MODE;
+    }
 
-  /**
-   * @brief Destroy the Controller object.
-   * @details Ensures all movement is halted and resources are released safely.
-   */
-  ~Controller() {}
+    /**
+     * @brief Destroy the Controller object.
+     * @details Ensures all movement is halted and resources are released safely.
+     */
+    ~Controller() {}
 
-  /**
-   * @brief Main execution loop for the turret system.
-   * @details When called, this method polls the detection module for targets
-   * and the joystick for user input. It calculates the necessary PWM or
-   * step values and updates the movement manager state.
-   */
-  void run();
+    /**
+     * @brief Main execution loop for the turret system.
+     * @details When called, this method polls the detection module for targets
+     * and the joystick for user input. It calculates the necessary PWM or
+     * step values and updates the movement manager state.
+     */
+    void run();
 };
