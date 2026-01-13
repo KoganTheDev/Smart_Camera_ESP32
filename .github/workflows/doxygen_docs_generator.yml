@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             # 1. Pull the repository onto the virtual builder
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             # 2. Prepare the environment
             # PlatformIO is a Python-based tool, so we need a stable Python version.

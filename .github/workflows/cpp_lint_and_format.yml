@@ -13,7 +13,7 @@ jobs:
             # Crucial: Allows the bot to push "style fix" commits back to your repo
             contents: write 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Set up Python
               uses: actions/setup-python@v5
