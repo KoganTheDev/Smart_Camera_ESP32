@@ -72,7 +72,7 @@ jobs:
             # "Actions" tab to see a detailed breakdown of your code quality.
             - name: Upload HTML Artifact
               if: always()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: cppcheck-dashboard
                   path: report/
