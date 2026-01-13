@@ -1,43 +1,32 @@
-# .github/workflows/build_firmware.yml
-# This workflow compiles the source code into a flashable binary (.bin).
-# It ensures that your code is always in a "deployable" state.
+# .github/workflows/doxygen_docs_generator.yml
+# This workflow automatically generates an API documentation website from your code.
+# It triggers every time you push to the 'main' branch.
 
-name: Firmware Builder
+name: Doxygen - Documentation Generator
 
 on:
     push:
         branches: [main]
-    workflow_dispatch: # Allows you to manually trigger a build from the GitHub 'Actions' tab
 
 jobs:
-    build:
+    docs:
         runs-on: ubuntu-latest
         steps:
-            # 1. Pull the repository onto the virtual builder
-            - uses: actions/checkout@v6
+            # 1. Pull the latest code
+            - name: Checkout Code
+              uses: actions/checkout@v6 # Kept as v6 per your request
 
-            # 2. Prepare the environment
-            # PlatformIO is a Python-based tool, so we need a stable Python version.
-            - name: Set up Python
-              uses: actions/setup-python@v6
+            # 2. Run Doxygen
+            # We set the working-directory to src/ESP32 so it finds your code and Doxyfile.
+            - name: Generate Doxygen
+              uses: mattnotneil/doxygen-action@v1.9.2
               with:
-                  python-version: "3.9"
+                  working-directory: "src/ESP32"
 
-            # 3. Install the compiler engine
-            - name: Install PlatformIO
-              run: pip install -U platformio
-
-            # 4. The Compilation Step
-            # This runs 'pio run', which reads your platformio.ini,
-            # downloads libraries, and compiles the code.
-            - name: Compile Project
-              run: pio run
-
-            # 5. Archive the result
-            # This takes the generated firmware.bin and saves it to GitHub.
-            # You can download this later to flash your ESP32 without needing to re-compile.
-            - name: Upload Artifacts
-              uses: actions/upload-artifact@v6
+            # 3. Deploy to the Web
+            # Doxygen creates the 'html' folder inside the working-directory.
+            - name: Upload to GitHub Pages
+              uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  name: compiled-firmware
-                  path: .pio/build/*/firmware.bin
+                  folder: src/ESP32/html 
+                  branch: gh-pages

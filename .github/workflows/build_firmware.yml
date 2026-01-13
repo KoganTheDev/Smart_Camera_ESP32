@@ -1,25 +1,42 @@
+# .github/workflows/build_firmware.yml
+# This workflow compiles the ESP32 source code into a flashable binary.
+# It targets the project located in the 'src/ESP32' sub-directory.
+
 name: Firmware Builder
 
 on:
     push:
         branches: [main]
-    workflow_dispatch: # Allows manual trigger
+    workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            # 1. Fetch the repository code
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            # 2. Setup the Python environment required by PlatformIO
             - name: Set up Python
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.9"
+
+            # 3. Install the PlatformIO Core CLI
             - name: Install PlatformIO
               run: pip install -U platformio
+
+            # 4. Compile the Project
             - name: Compile Project
+              working-directory: src/ESP32
               run: pio run
+
+            # 5. Save the resulting Binary
+            # This uploads the firmware.bin so you can download it from the GitHub UI.
+            # The path is relative to the working directory.
             - name: Upload Artifacts
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v4
               with:
                   name: compiled-firmware
-                  path: .pio/build/*/firmware.bin
+                  path: src/ESP32/.pio/build/*/firmware.bin

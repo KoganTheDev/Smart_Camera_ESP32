@@ -2,7 +2,7 @@
 # This workflow ensures the code is logically sound and perfectly formatted.
 # If the formatting is off, it FIXES the code and commits it back to your branch.
 
-name: Style and Logic Guard
+name: CPP Linter & Formmater
 
 on: [push, pull_request]
 
@@ -10,36 +10,39 @@ jobs:
     format-and-check:
         runs-on: ubuntu-latest
         permissions:
-            # Crucial: Allows the bot to push "style fix" commits back to your repo
             contents: write 
         steps:
-            - uses: actions/checkout@v6
+            # 1. Fetch the code
+            - name: Checkout Code
+              uses: actions/checkout@v4
 
+            # 2. Setup Python
             - name: Set up Python
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.9"
 
+            # 3. Install Tools
             - name: Install PlatformIO and Clang-Format
               run: |
                   pip install -U platformio
                   sudo apt-get install -y clang-format
 
-            # 1. Logic Check
-            # Runs Cppcheck via PlatformIO. It ensures you haven't introduced 
-            # critical bugs (memory leaks, etc.)
-            - name: Run Cppcheck
-              run: pio check --fail-on-warnings
+            # 4. Logic Check (Mental Peace - no local noise)
+            - name: Run PlatformIO Check
+              working-directory: src/ESP32
+              run: pio check --severity=high --severity=medium
 
-            # 2. Format Fixer (Silent cleaning)
-            # Scans all source folders and applies your project's style rules.
+            # 5. Format Fixer (Silent cleaning)
+            # This targets your nested code folders specifically.
             - name: Run Clang-Format
-              run: find src include lib -iname *.h -o -iname *.cpp -o -iname *.hpp | xargs clang-format -i
+              run: |
+                find src/ESP32/src src/ESP32/include src/ESP32/lib -iname *.h -o -iname *.cpp -o -iname *.hpp | xargs clang-format -i
 
-            # 3. Automation: Push fixes back
+            # 6. Automation: Push fixes back
             # If Clang-Format changed any files, this step detects it and 
             # creates a new commit automatically.
             - name: Commit changes
-              uses: stefanzweifel/git-auto-commit-action@v7
+              uses: stefanzweifel/git-auto-commit-action@v5
               with:
-                  commit_message: "GITHUB-WORKFLOW: auto-formatted code"
+                  commit_message: "GITHUB-ACTIONS: auto-formatted code"

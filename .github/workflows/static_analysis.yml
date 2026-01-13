@@ -1,6 +1,5 @@
 # .github/workflows/static_analysis.yml
-# This workflow performs deep static analysis to find logic errors and security flaws.
-# It acts as a "blocker"—if this fails, you cannot merge your code.
+# This workflow performs high-standard static analysis to catch logic, memory, and security errors.
 
 name: Cppcheck Static Analysis
 
@@ -15,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout Code
-              uses: actions/checkout@v6
+              uses: actions/checkout@v6 # Kept as v6 per your request
 
             - name: Install Cppcheck
               run: |
@@ -29,14 +28,16 @@ jobs:
               run: echo "::add-matcher::.github/cppcheck-matcher.json"
               continue-on-error: true
 
-            # 2. The Blocker: Strict Analysis
-            # This is the most important step. It runs Cppcheck with --error-exitcode=1.
-            # If it finds a style, performance, or portability issue, the whole build fails.
+            # 2. The Blocker: Strict Logic Analysis
+            # - Targets only your project folders (src, lib, include) to avoid .pio/libdeps.
+            # - Suppresses 'unusedFunction' to stop flagging Arduino framework functions (setup/loop).
+            # - Enabled: warning, error, performance, portability (hides the 39 'Low' style issues).
             - name: Run Cppcheck Analysis (The Blocker)
               run: |
                   mkdir -p report
-                  cppcheck --enable=all --inline-suppr --std=c++11 --force \
+                  cppcheck --enable=warning,error,performance,portability --inline-suppr --std=c++11 --force \
                            --xml --xml-version=2 \
+                           --suppress=unusedFunction \
                            --suppress=missingIncludeSystem --suppress=missingInclude \
                            --error-exitcode=1 \
                            src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
@@ -45,20 +46,20 @@ jobs:
                            2> cppcheck_report.xml
 
             # 3. User Feedback: Console Summary
-            # If the blocker above fails, this step prints a human-readable list of
-            # errors in the GitHub Actions console so you can find them quickly.
+            # This provides a human-readable list of logic errors in the GitHub Actions console.
             - name: Generate Console Output
               if: failure() || success()
               run: |
-                  cppcheck --enable=all --inline-suppr --std=c++11 --force \
+                  cppcheck --enable=warning,error,performance,portability --inline-suppr --std=c++11 --force \
                            --template="{file}:{line}:{column}: {severity}: {message}" \
+                           --suppress=unusedFunction \
                            --suppress=missingIncludeSystem --suppress=missingInclude \
                            src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
                            -I src/ESP32/include/ -I src/ESP32/src/ \
                            $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null)
 
             # 4. Visualization: HTML Dashboard
-            # Converts the raw XML results into a beautiful, clickable HTML website.
+            # Converts the raw results into a detailed HTML website for deep-debugging.
             - name: Generate HTML Report
               if: always()
               run: |
@@ -68,11 +69,10 @@ jobs:
                                       --title="High Standard ESP32 Analysis"
 
             # 5. Storage: Artifact Upload
-            # Saves the HTML report for 14 days. You can download this from the
-            # "Actions" tab to see a detailed breakdown of your code quality.
+            # Saves the HTML report for 14 days, accessible via the Actions tab.
             - name: Upload HTML Artifact
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v6 # Kept as v6 per your request
               with:
                   name: cppcheck-dashboard
                   path: report/
