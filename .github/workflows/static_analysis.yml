@@ -23,8 +23,6 @@ jobs:
         continue-on-error: true
 
       - name: Run Cppcheck Analysis (The Blocker)
-        # STRICT MODE: Removed unusedFunction and cstyleCast suppressions.
-        # Now fails on Style, Performance, and Portability to ensure high standards.
         run: |
           mkdir -p report
           cppcheck --enable=all --inline-suppr --std=c++11 --force \
@@ -36,17 +34,6 @@ jobs:
                    $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null) \
                    2> cppcheck_report.xml
 
-      - name: Generate Console Output
-        # This step runs whether the blocker passed or failed to provide annotations.
-        if: failure() || success()
-        run: |
-          cppcheck --enable=all --inline-suppr --std=c++11 --force \
-                   --template="{file}:{line}:{column}: {severity}: {message}" \
-                   --suppress=missingIncludeSystem --suppress=missingInclude \
-                   src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
-                   -I src/ESP32/include/ -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null)
-
       - name: Generate HTML Report
         if: always()
         run: |
@@ -54,6 +41,47 @@ jobs:
                               --report-dir=report \
                               --source-dir=. \
                               --title="High Standard ESP32 Analysis"
+
+      - name: Inject Custom UI (CSS & JS)
+        if: always()
+        run: |
+          # Define a modern dark-themed CSS
+          cat <<EOF > report/custom_style.css
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: #e0e0e0; margin: 20px; }
+          h1 { color: #00adb5; border-bottom: 2px solid #393e46; padding-bottom: 10px; }
+          table { width: 100%; border-collapse: collapse; background: #222831; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+          th { background-color: #393e46; color: #00adb5; padding: 12px; text-align: left; text-transform: uppercase; font-size: 0.85rem; }
+          td { padding: 10px; border-bottom: 1px solid #323232; font-size: 0.9rem; }
+          tr:hover { background-color: #2d333b; }
+          .error { color: #ff4d4d; font-weight: bold; }
+          .warning { color: #ffa500; }
+          .style { color: #00adb5; }
+          .performance { color: #b552f7; }
+          #search-bar { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #393e46; background: #222831; color: white; }
+          EOF
+
+          # Inject the CSS into all generated HTML files
+          find report -name "*.html" -exec sed -i '/<\/head>/i <link rel="stylesheet" href="custom_style.css">' {} +
+          
+          # Add a simple Search JS to the index page
+          cat <<EOF >> report/index.html
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const search = document.createElement('input');
+              search.id = 'search-bar';
+              search.placeholder = 'Search for files or errors...';
+              document.body.insertBefore(search, document.querySelector('table'));
+              
+              search.addEventListener('keyup', function() {
+                const value = this.value.toLowerCase();
+                const rows = document.querySelectorAll('table tr:not(:first-child)');
+                rows.forEach(row => {
+                  row.style.display = row.innerText.toLowerCase().includes(value) ? '' : 'none';
+                });
+              });
+            });
+          </script>
+          EOF
 
       - name: Upload HTML Artifact
         if: always()
