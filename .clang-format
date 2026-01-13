@@ -1,0 +1,23 @@
+Language: Cpp
+BasedOnStyle: LLVM
+
+# 1. Fix Braces: Puts the brace on a new line for functions
+# This changes func() { to func()\n{
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterNamespace: true
+
+# 2. Fix Pointers & References: Moves the * and & to the left
+# This changes int *var to int* var
+PointerAlignment: Left
+
+# 3. Fix Line Length: Increases the characters allowed per line
+# Standard is usually 80; 120 gives you more "breathing room"
+ColumnLimit: 120
+
+# 4. General Cleanup
+IndentWidth: 4
+AccessModifierOffset: -4

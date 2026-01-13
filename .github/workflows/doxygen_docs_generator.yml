@@ -19,7 +19,7 @@ jobs:
             # 2. Run Doxygen
             # We set the working-directory to src/ESP32 so it finds your code and Doxyfile.
             - name: Generate Doxygen
-              uses: mattnotneil/doxygen-action@v1.9.2
+              uses: mattnotmitt/doxygen-action@v1.9.5
               with:
                   working-directory: "src/ESP32"
 
