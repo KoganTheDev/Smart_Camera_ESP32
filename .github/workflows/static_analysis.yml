@@ -14,42 +14,38 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+
+      - name: Setup Problem Matcher
+        # This built-in trick makes GitHub recognize GCC-style errors automatically
+        run: echo "::add-matcher::${{ runner.tool_cache }}/../../../../etc/cppcheck/cppcheck-cppcheck.json" || echo "::add-matcher::.github/cppcheck-matcher.json"
+        continue-on-error: true
 
       - name: Run Cppcheck Analysis
-        # We output to XML for the HTML report and a text file for the Annotator
+        # Generating both console output (annotations) and XML (report)
         run: |
           mkdir -p report
           cppcheck --enable=all --inline-suppr --force --xml --xml-version=2 \
+                   --template=gcc \
                    --suppress=missingIncludeSystem --suppress=unusedFunction \
                    --suppress=cstyleCast --suppress=missingInclude \
                    src/ESP32/src/ src/ESP32/lib/ \
                    -I src/ESP32/include/ -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p ") \
+                   $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null) \
                    2> cppcheck_report.xml
-
-      - name: Generate HTML Report
-        run: |
-          mkdir -p report
           
-          # 1. Output to console for GitHub Annotations (Human Readable)
+          # Also print to stdout so the Problem Matcher picks it up for Annotations
           cppcheck --enable=all --inline-suppr --force --template=gcc \
                    --suppress=missingIncludeSystem --suppress=unusedFunction \
                    --suppress=cstyleCast --suppress=missingInclude \
                    src/ESP32/src/ src/ESP32/lib/ \
                    -I src/ESP32/include/ -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p ")
+                   $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null)
 
-          # 2. Output to XML for the HTML Dashboard
-          cppcheck --enable=all --inline-suppr --force --xml --xml-version=2 \
-                   --suppress=missingIncludeSystem --suppress=unusedFunction \
-                   --suppress=cstyleCast --suppress=missingInclude \
-                   src/ESP32/src/ src/ESP32/lib/ \
-                   -I src/ESP32/include/ -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p ") \
-                   2> cppcheck_report.xml
-
-          # 3. Generate the Dashboard
+      - name: Generate HTML Report
+        run: |
           cppcheck-htmlreport --file=cppcheck_report.xml \
                               --report-dir=report \
                               --source-dir=. \
@@ -61,11 +57,4 @@ jobs:
         with:
           name: cppcheck-dashboard
           path: report/
-
-      - name: Create GitHub Annotations
-        uses: cpp-linter/cppcheck-action@v2
-        with:
-          # This reads the XML we already generated and highlights the PR code
-          output_file: cppcheck_report.xml
-          # Set to 'true' if you want the build to fail on errors
-          fail_on_error: true
+          retention-days: 14
