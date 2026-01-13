@@ -1,0 +1,43 @@
+# .github/workflows/build_firmware.yml
+# This workflow compiles the source code into a flashable binary (.bin).
+# It ensures that your code is always in a "deployable" state.
+
+name: Firmware Builder
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch: # Allows you to manually trigger a build from the GitHub 'Actions' tab
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            # 1. Pull the repository onto the virtual builder
+            - uses: actions/checkout@v4
+
+            # 2. Prepare the environment
+            # PlatformIO is a Python-based tool, so we need a stable Python version.
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.9"
+
+            # 3. Install the compiler engine
+            - name: Install PlatformIO
+              run: pip install -U platformio
+
+            # 4. The Compilation Step
+            # This runs 'pio run', which reads your platformio.ini,
+            # downloads libraries, and compiles the code.
+            - name: Compile Project
+              run: pio run
+
+            # 5. Archive the result
+            # This takes the generated firmware.bin and saves it to GitHub.
+            # You can download this later to flash your ESP32 without needing to re-compile.
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: compiled-firmware
+                  path: .pio/build/*/firmware.bin

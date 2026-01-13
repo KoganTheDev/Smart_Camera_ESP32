@@ -1,64 +1,79 @@
+# .github/workflows/static_analysis.yml
+# This workflow performs deep static analysis to find logic errors and security flaws.
+# It acts as a "blocker"—if this fails, you cannot merge your code.
+
 name: Cppcheck Static Analysis
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+    push:
+        branches: [main, master]
+    pull_request:
+        branches: [main, master]
 
 jobs:
-  cppcheck:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    cppcheck:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
 
-      - name: Install Cppcheck
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cppcheck
+            - name: Install Cppcheck
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y cppcheck
 
-      - name: Setup Problem Matcher
-        run: echo "::add-matcher::.github/cppcheck-matcher.json"
-        continue-on-error: true
+            # 1. Integration: Problem Matcher
+            # This allows GitHub to "read" the linter output and place red markers
+            # directly on your code in the "Files Changed" tab.
+            - name: Setup Problem Matcher
+              run: echo "::add-matcher::.github/cppcheck-matcher.json"
+              continue-on-error: true
 
-      - name: Run Cppcheck Analysis (The Blocker)
-        # STRICT MODE: Removed unusedFunction and cstyleCast suppressions.
-        # Now fails on Style, Performance, and Portability to ensure high standards.
-        run: |
-          mkdir -p report
-          cppcheck --enable=all --inline-suppr --std=c++11 --force \
-                   --xml --xml-version=2 \
-                   --suppress=missingIncludeSystem --suppress=missingInclude \
-                   --error-exitcode=1 \
-                   src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
-                   -I src/ESP32/include/ -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null) \
-                   2> cppcheck_report.xml
+            # 2. The Blocker: Strict Analysis
+            # This is the most important step. It runs Cppcheck with --error-exitcode=1.
+            # If it finds a style, performance, or portability issue, the whole build fails.
+            - name: Run Cppcheck Analysis (The Blocker)
+              run: |
+                  mkdir -p report
+                  cppcheck --enable=all --inline-suppr --std=c++11 --force \
+                           --xml --xml-version=2 \
+                           --suppress=missingIncludeSystem --suppress=missingInclude \
+                           --error-exitcode=1 \
+                           src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
+                           -I src/ESP32/include/ -I src/ESP32/src/ \
+                           $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null) \
+                           2> cppcheck_report.xml
 
-      - name: Generate Console Output
-        # This step runs whether the blocker passed or failed to provide annotations.
-        if: failure() || success()
-        run: |
-          cppcheck --enable=all --inline-suppr --std=c++11 --force \
-                   --template="{file}:{line}:{column}: {severity}: {message}" \
-                   --suppress=missingIncludeSystem --suppress=missingInclude \
-                   src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
-                   -I src/ESP32/include/ -I src/ESP32/src/ \
-                   $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null)
+            # 3. User Feedback: Console Summary
+            # If the blocker above fails, this step prints a human-readable list of
+            # errors in the GitHub Actions console so you can find them quickly.
+            - name: Generate Console Output
+              if: failure() || success()
+              run: |
+                  cppcheck --enable=all --inline-suppr --std=c++11 --force \
+                           --template="{file}:{line}:{column}: {severity}: {message}" \
+                           --suppress=missingIncludeSystem --suppress=missingInclude \
+                           src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
+                           -I src/ESP32/include/ -I src/ESP32/src/ \
+                           $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null)
 
-      - name: Generate HTML Report
-        if: always()
-        run: |
-          cppcheck-htmlreport --file=cppcheck_report.xml \
-                              --report-dir=report \
-                              --source-dir=. \
-                              --title="High Standard ESP32 Analysis"
+            # 4. Visualization: HTML Dashboard
+            # Converts the raw XML results into a beautiful, clickable HTML website.
+            - name: Generate HTML Report
+              if: always()
+              run: |
+                  cppcheck-htmlreport --file=cppcheck_report.xml \
+                                      --report-dir=report \
+                                      --source-dir=. \
+                                      --title="High Standard ESP32 Analysis"
 
-      - name: Upload HTML Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cppcheck-dashboard
-          path: report/
-          retention-days: 14
+            # 5. Storage: Artifact Upload
+            # Saves the HTML report for 14 days. You can download this from the
+            # "Actions" tab to see a detailed breakdown of your code quality.
+            - name: Upload HTML Artifact
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: cppcheck-dashboard
+                  path: report/
+                  retention-days: 14

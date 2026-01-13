@@ -1,17 +1,17 @@
 {
-  "problemMatcher": [
-    {
-      "owner": "cppcheck",
-      "pattern": [
+    "problemMatcher": [
         {
-          "regexp": "^([^\\s]+):(\\d+):(\\d+):\\s+(style|error|warning|performance|portability|information):\\s+(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "severity": 4,
-          "message": 5
+            "owner": "cppcheck",
+            "pattern": [
+                {
+                    "regexp": "^([^\\s]+):(\\d+):(\\d+):\\s+(style|error|warning|performance|portability|information):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

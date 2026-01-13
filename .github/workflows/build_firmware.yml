@@ -1,0 +1,25 @@
+name: Firmware Builder
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch: # Allows manual trigger
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.9"
+            - name: Install PlatformIO
+              run: pip install -U platformio
+            - name: Compile Project
+              run: pio run
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: compiled-firmware
+                  path: .pio/build/*/firmware.bin
