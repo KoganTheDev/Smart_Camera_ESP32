@@ -31,7 +31,7 @@ inline String modeToString(SystemControl mode)
     case SystemControl::AI_MODE:
         return "AI_AUTONOMOUS";
     }
-    return;
+    return "";
 }
 
 /**
