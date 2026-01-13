@@ -22,33 +22,38 @@ jobs:
         run: echo "::add-matcher::.github/cppcheck-matcher.json"
         continue-on-error: true
 
-      - name: Run Cppcheck Analysis
-        # Generating both console output (annotations) and XML (report)
+      - name: Run Cppcheck Analysis (The Blocker)
+        # STRICT MODE: Removed unusedFunction and cstyleCast suppressions.
+        # Now fails on Style, Performance, and Portability to ensure high standards.
         run: |
           mkdir -p report
-          cppcheck --enable=all --inline-suppr --force --xml --xml-version=2 \
-                   --template=gcc \
-                   --suppress=missingIncludeSystem --suppress=unusedFunction \
-                   --suppress=cstyleCast --suppress=missingInclude \
-                   src/ESP32/src/ src/ESP32/lib/ \
+          cppcheck --enable=all --inline-suppr --std=c++11 --force \
+                   --xml --xml-version=2 \
+                   --suppress=missingIncludeSystem --suppress=missingInclude \
+                   --error-exitcode=1 \
+                   src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
                    -I src/ESP32/include/ -I src/ESP32/src/ \
                    $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null) \
                    2> cppcheck_report.xml
-          
-          # Also print to stdout so the Problem Matcher picks it up for Annotations
-          cppcheck --enable=all --inline-suppr --force --template=gcc \
-                   --suppress=missingIncludeSystem --suppress=unusedFunction \
-                   --suppress=cstyleCast --suppress=missingInclude \
-                   src/ESP32/src/ src/ESP32/lib/ \
+
+      - name: Generate Console Output
+        # This step runs whether the blocker passed or failed to provide annotations.
+        if: failure() || success()
+        run: |
+          cppcheck --enable=all --inline-suppr --std=c++11 --force \
+                   --template="{file}:{line}:{column}: {severity}: {message}" \
+                   --suppress=missingIncludeSystem --suppress=missingInclude \
+                   src/ESP32/src/ src/ESP32/lib/ src/ESP32/include/ \
                    -I src/ESP32/include/ -I src/ESP32/src/ \
                    $(find src/ESP32/lib -type d -printf "-I %p " 2>/dev/null)
 
       - name: Generate HTML Report
+        if: always()
         run: |
           cppcheck-htmlreport --file=cppcheck_report.xml \
                               --report-dir=report \
                               --source-dir=. \
-                              --title="ESP32 Analysis Results"
+                              --title="High Standard ESP32 Analysis"
 
       - name: Upload HTML Artifact
         if: always()
