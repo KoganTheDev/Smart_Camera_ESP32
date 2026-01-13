@@ -1,20 +1,44 @@
 #include "controller.h"
 
-std::tuple<MoveDirectionX, MoveDirectionY> Controller::detect_object(std::tuple<uint8_t, uint8_t> current_location)
-{
-    // 1. Extract the raw numeric coordinates from the input
-    uint8_t new_x = std::get<0>(current_location);
-    uint8_t new_y = std::get<1>(current_location);
+// debug
+#include "constants.h"
+//
 
-    // 2. Compare numbers (this->x) to numbers (new_x)
-    // 3. Assign the result to an Enum (MoveDirectionX)
-    MoveDirectionX x_axis_movement = (this->x > new_x ? MoveDirectionX::Left
-        : (this->x < new_x) ? MoveDirectionX::Right
-        : MoveDirectionX::None);
+void Controller::run()
+{   
+    if (this->_joystick.is_z_pressed()) // Flip control state
+    {
+        this->_system_control_state = toggleControlMode(this->_system_control_state);
+        Serial.printf("[CONTROLLER] Mode changed to: %s\n", modeToString(this->_system_control_state).c_str());
+    }
 
-    MoveDirectionY y_axis_movement = (this->y > new_y ? MoveDirectionY::Down
-        : (this->y < new_y) ? MoveDirectionY::Up
-        : MoveDirectionY::None);
-        
-    return std::make_tuple(x_axis_movement, y_axis_movement);
+    std::tuple<MoveDirectionX, MoveDirectionY> move_directions;
+
+    if (this->_system_control_state == SystemControl::USER_MODE) // USER mode
+    {
+        // TODO: improve, maybe use the speed functionality of the joystick
+        //? Currently mapped to the move directions instead of an actual speed
+
+        int speed_x = this->_joystick.get_speed_x();
+        int speed_y = this->_joystick.get_speed_y();
+
+        MoveDirectionX user_yaw = (speed_x > 0) ? MoveDirectionX::Right : 
+                                (speed_x < 0) ? MoveDirectionX::Left : 
+                                                MoveDirectionX::None;
+
+        MoveDirectionY user_pitch = (speed_y > 0) ? MoveDirectionY::Up : 
+                                    (speed_y < 0) ? MoveDirectionY::Down : 
+                                                    MoveDirectionY::None;
+
+        //? TEMP FIX END
+
+        move_directions = std::make_tuple(user_yaw, user_pitch);
+    }
+    else // AI mode
+    {
+        move_directions = this->_detection_module.detect_object(NULL); //! Used Null since it's' currently isn't attached to the camera logic    
+    }
+
+
+    this->_movement_manager.move_relative(move_directions);
 }

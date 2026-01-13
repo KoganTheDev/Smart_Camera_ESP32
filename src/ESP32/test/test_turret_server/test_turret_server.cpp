@@ -2,7 +2,7 @@
 #include <unity.h>
 #include "turret_server.h"
 #include "camera.h"   // Your Camera class
-#include "network.h"  // Your Network class
+#include "wifi_manager.h"  // Your Network class
 #include "secrets.h"  // For WIFI_SSID, WIFI_PASSWORD
 
 HttpServer* test_server;
@@ -47,17 +47,18 @@ void test_live_interaction(void) {
     bool cam_ok = test_camera->begin();
     TEST_ASSERT_TRUE_MESSAGE(cam_ok, "Camera Hardware failed to initialize");
 
-    // Connect to Network so we can actually visit the IP
-    bool wifi_ok = Network::connect(WIFI_SSID, WIFI_PASSWORD);
-    TEST_ASSERT_TRUE_MESSAGE(wifi_ok, "WiFi failed - cannot test live stream");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500); 
+        Serial.print(".");
+    }
 
     // Start Server
     test_server->start(test_camera);
 
     Serial.println("\n==========================================");
     Serial.println("LIVE TEST ACTIVE FOR 60 SECONDS");
-    Serial.printf("STREAM: http://%s/stream\n", Network::get_ip().c_str());
-    Serial.printf("MOVE:   http://%s/move?pan=90&tilt=45\n", Network::get_ip().c_str());
+    Serial.printf("STREAM: http://%s/stream\n", WifiManager::get_ip().c_str());
+    Serial.printf("MOVE:   http://%s/move?pan=90&tilt=45\n", WifiManager::get_ip().c_str());
     Serial.println("==========================================\n");
 
     // Keep the test alive for 1 minute to allow manual browser check
@@ -69,7 +70,7 @@ void setup() {
     Serial.begin(115200);
 
     // This sets up the LwIP stack (the "mbox") so the server doesn't crash
-    Network::connect(WIFI_SSID, WIFI_PASSWORD); 
+    WifiManager::connect(WIFI_SSID, WIFI_PASSWORD); 
 
     UNITY_BEGIN();
 

@@ -6,36 +6,43 @@
 #include <time.h>
 #include <Arduino.h>
 
-class TestDetection
+#include "move_types.h"
+
+class TestDetection : public BaseDetectionModule
 {
 private:
-    /* data */
+    static inline int print_limit = 0;
+
 public:
     TestDetection() {}
     ~TestDetection() {}
 
-    virtual std::tuple<uint8_t, uint8_t> detect_object(camera_fb_t* frame)
+    std::tuple<MoveDirectionX, MoveDirectionY> detect_object(camera_fb_t* frame)
     {
         srand(time(0));
 
         int min = 0;
         int max = 2;
 
-        uint8_t random_number_x = (rand() % (max - min + 1)) + min;
-        uint8_t random_number_y = (rand() % (max - min + 1)) + min;
+        MoveDirectionX random_number_x = MoveDirectionX((rand() % (max - min + 1)) + min);
+        MoveDirectionY random_number_y = MoveDirectionY((rand() % (max - min + 1)) + min);
 
-        Serial.print("x movement: ");
+        if (print_limit == 100)
+        {
+            print_limit = 0;
+
+            Serial.print("x movement: ");
         switch (random_number_x)
         {
-        case 0:
+        case MoveDirectionX::None:
             Serial.println("stay");
             break;
         
-        case 1:
+        case MoveDirectionX::Right:
             Serial.println("right");
             break;
 
-        case 2:
+        case MoveDirectionX::Left:
             Serial.println("left");
             break;
 
@@ -47,15 +54,15 @@ public:
         Serial.print("y movement: ");
         switch (random_number_y)
         {
-        case 0:
+        case MoveDirectionY::None:
             Serial.println("stay");
             break;
         
-        case 1:
+        case MoveDirectionY::Up:
             Serial.println("up");
             break;
 
-        case 2:
+        case MoveDirectionY::Down:
             Serial.println("down");
             break;
 
@@ -63,11 +70,13 @@ public:
             break;
         }
 
+        Serial.printf("Tuple returned (%d, %d)\n", random_number_x, random_number_y);
+        }
+        
 
-        Serial.printf("Tuple returned (%d, %d)", random_number_x, random_number_y);
+        print_limit++;
 
         return std::make_tuple(random_number_x, random_number_y);
     };
-
 };
 

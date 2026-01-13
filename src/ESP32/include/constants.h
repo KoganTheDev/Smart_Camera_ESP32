@@ -2,27 +2,18 @@
 
 #define BAUDRATE 115200
 
+// --- Joystick Config ---
+#define JOYSTICK_PIN_X 34  
+#define JOYSTICK_PIN_Y 35
+#define JOYSTICK_PIN_Z 32
 
-// ESP32 GPIOs
-#define GPIO_1 1
-#define GPIO_2 2
-#define GPIO_3 3
-#define GPIO_4 4
-#define GPIO_5 5
-#define GPIO_6 6
-#define GPIO_7 7
-#define GPIO_8 8
-#define GPIO_9 9
-#define GPIO_10 10
-#define GPIO_11 11
-#define GPIO_12 12
-#define GPIO_13 13
-#define GPIO_14 14
-#define GPIO_15 15
-#define GPIO_16 16
-#define GPIO_17 17
-#define GPIO_18 18
-#define GPIO_19 19
-#define GPIO_20 20
-#define GPIO_21 21
-#define GPIO_22 22
+// --- Servo Config ---
+#define SERVO_PIN 15
+
+// --- Stepper Config ---
+#define STEPPER_NUMBER_OF_STEPS 2048 
+#define STEPPER_SPEED 10   // Set speed to 10 RPM
+#define STEPPER_PIN1 16
+#define STEPPER_PIN2 17
+#define STEPPER_PIN3 5
+#define STEPPER_PIN4 18
