@@ -40,6 +40,6 @@ jobs:
             # If Clang-Format changed any files, this step detects it and 
             # creates a new commit automatically.
             - name: Commit changes
-              uses: stefanzweifel/git-auto-commit-action@v5
+              uses: stefanzweifel/git-auto-commit-action@v7
               with:
                   commit_message: "GITHUB-WORKFLOW: auto-formatted code"
