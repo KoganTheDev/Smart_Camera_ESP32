@@ -25,6 +25,8 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
 
     return std::make_tuple(x_axis_movement, y_axis_movement);
     */
+
+    return;
 }
 
 void CameraDiffDetection::roberts_cross(camera_fb_t* frame, uint8_t* output_edges)
