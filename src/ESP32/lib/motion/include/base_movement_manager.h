@@ -11,19 +11,19 @@
 /**
  * @class BaseMovementManager
  * @brief Abstract base class for turret movement hardware abstraction.
- * @details This interface defines the contract for any class responsible for 
+ * @details This interface defines the contract for any class responsible for
  * physical movement.
  */
-class BaseMovementManager
-{
+class BaseMovementManager {
 public:
-    /**
-     * @brief Virtual destructor for safe polymorphic cleanup.
-     */
-    virtual ~BaseMovementManager() = default;
+  /**
+   * @brief Virtual destructor for safe polymorphic cleanup.
+   */
+  virtual ~BaseMovementManager() = default;
 
-    /**
-     * @brief Moves the turret relative to its current orientation.
-     */
-    virtual void move_relative(std::tuple<MoveDirectionX, MoveDirectionY> move_directions) = 0;
+  /**
+   * @brief Moves the turret relative to its current orientation.
+   */
+  virtual void
+  move_relative(std::tuple<MoveDirectionX, MoveDirectionY> move_directions) = 0;
 };

@@ -1,9 +1,9 @@
 /**
  * @file index_html.h
  * @brief Web Interface for the ESP32-CAM Turret system.
- * This file contains the raw HTML, CSS, and JavaScript stored in Flash memory (PROGMEM).
- * The interface provides a live MJPEG stream, a directional D-Pad for motor control,
- * and a firing trigger.
+ * This file contains the raw HTML, CSS, and JavaScript stored in Flash memory
+ * (PROGMEM). The interface provides a live MJPEG stream, a directional D-Pad
+ * for motor control, and a firing trigger.
  */
 
 #pragma once
@@ -12,7 +12,7 @@
 
 /**
  * @brief Raw string containing the full web interface.
- * Stored in PROGMEM to conserve SRAM. This page is served by the HttpServer 
+ * Stored in PROGMEM to conserve SRAM. This page is served by the HttpServer
  * index_handler to the client's browser.
  */
 static const char HTML_PAGE[] PROGMEM = R"rawliteral(
