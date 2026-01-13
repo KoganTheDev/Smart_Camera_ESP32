@@ -3,6 +3,3 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-
-# For now don't upload sound lib, if implemented and work without blocking logic => upload
-sound

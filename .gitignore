@@ -233,3 +233,6 @@ README
 Code_Standards.md
 /src/ESP32/README.md
 .vscode
+
+#? For now don't upload the music folder
+music
