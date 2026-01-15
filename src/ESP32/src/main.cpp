@@ -34,7 +34,6 @@ void setup()
     // http_server.start(&camera);
 
     servo.attach(SERVO_PIN);
-    stepper.setSpeed(STEPPER_SPEED);
 }
 
 void loop()

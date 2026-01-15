@@ -12,8 +12,7 @@
 
 // --- Stepper Config ---
 #define STEPPER_NUMBER_OF_STEPS 2048
-#define STEPPER_SPEED 10 // Set speed to 10 RPM
-#define STEPPER_PIN1 16
-#define STEPPER_PIN2 17
+#define STEPPER_PIN1 13
+#define STEPPER_PIN2 33
 #define STEPPER_PIN3 5
 #define STEPPER_PIN4 18

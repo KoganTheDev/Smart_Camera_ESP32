@@ -1,9 +1,5 @@
 #include "controller.h"
 
-// debug
-#include "constants.h"
-//
-
 void Controller::run()
 {
     if (this->_joystick.is_z_pressed()) // Flip control state
