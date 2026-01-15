@@ -28,7 +28,6 @@ private:
     static constexpr int _STEP_INCREMENT = 5;
     static constexpr int _STEPPER_SPEED = 10;
 
-
 public:
     /**
      * @brief Construct a new Movement Manager object.
