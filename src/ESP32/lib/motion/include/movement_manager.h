@@ -26,6 +26,8 @@ private:
 
     static constexpr int _SERVO_INCREMENT = 5;
     static constexpr int _STEP_INCREMENT = 5;
+    static constexpr int _STEPPER_SPEED = 10;
+
 
 public:
     /**
@@ -33,7 +35,10 @@ public:
      * @param stepper Reference to the initialized Stepper motor object.
      * @param servo Reference to the initialized Servo motor object.
      */
-    MovementManager(Stepper& stepper, Servo& servo) : _stepper(stepper), _servo(servo) {}
+    MovementManager(Stepper& stepper, Servo& servo) : _stepper(stepper), _servo(servo)
+    {
+        this->_stepper.setSpeed(this->_STEPPER_SPEED);
+    }
 
     /**
      * @brief Implements relative movement using Stepper and Servo hardware.
