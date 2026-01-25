@@ -41,31 +41,23 @@ void setup()
         Serial.println("[SYSTEM] ERROR: Camera initialization failed!");
     }
 
-    Serial.println("[SYSTEM] Connecting to WiFi...");
     WifiManager::connect(WIFI_SSID, WIFI_PASSWORD);
 
-    if (http_server.start(&camera))
+    if (http_server.start(&camera, &detection_manager))
     {
-        Serial.println("[SYSTEM] HTTP Server started successfully");
+        Serial.println("[SYSTEM] HTTP Server started with motion detection overlay");
     } else
     {
         Serial.println("[SYSTEM] ERROR: HTTP Server failed to start!");
     }
 
     servo.attach(SERVO_PIN);
-    Serial.println("[SYSTEM] Servo attached");
 
     Serial.println("[SYSTEM] Setup complete - AI_MODE active");
-    Serial.println("[SYSTEM] Waiting for motion...\n");
 }
 
 void loop()
 {
-    // Controller handles everything:
-    // - In USER_MODE: reads joystick, commands motors
-    // - In AI_MODE: captures frames, runs motion detection, commands motors
     controller.run();
-
-    // Maintain WiFi connection
     WifiManager::maintain();
 }

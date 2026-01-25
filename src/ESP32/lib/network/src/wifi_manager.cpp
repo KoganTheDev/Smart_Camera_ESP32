@@ -1,7 +1,5 @@
 #include "wifi_manager.h"
 
-#include "secrets.h"
-
 void WifiManager::connect(const String& ssid, const String& password)
 {
     if (ssid.length() == 0)
@@ -11,15 +9,23 @@ void WifiManager::connect(const String& ssid, const String& password)
     }
 
     Serial.printf("[WIFI] Initializing WiFi: %s\n", ssid.c_str());
-    WiFi.mode(WIFI_STA); // Enter Station mode
-    WiFi.begin(ssid, password);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid.c_str(), password.c_str());
     WiFi.setAutoReconnect(true);
 
     while (WiFi.status() != WL_CONNECTED)
     {
-        Serial.print(".");
         delay(500);
+        Serial.print(".");
+        
+        if (millis() > 30000) { // 30 second timeout
+            Serial.println("\n[WIFI] Connection Failed: Timeout");
+            return;
+        }
+        
     }
+
+    Serial.printf("\n[WIFI] Connected! ESP's IP Address: %s\n", get_ip().c_str()); 
 }
 
 bool WifiManager::is_connected() { return WiFi.status() == WL_CONNECTED; }
@@ -29,7 +35,7 @@ String WifiManager::get_ip() { return WiFi.localIP().toString(); }
 void WifiManager::maintain()
 {
     static unsigned long last_check = 0;
-    static bool last_state = false;
+    static bool last_state = true;
     unsigned long now = millis();
 
     // Only check every 5 seconds to save CPU cycles
@@ -40,7 +46,7 @@ void WifiManager::maintain()
 
         if (current_state && !last_state)
         {
-            Serial.printf("[WIFI] Connected! ESP's IP Address: %s\n", get_ip().c_str());
+            Serial.printf("MAINTAIN[WIFI] Connected! ESP's IP Address: %s\n", get_ip().c_str());
         } else if (!current_state)
         {
             if (last_state)

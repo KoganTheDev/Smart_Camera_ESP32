@@ -1,4 +1,5 @@
 #include "camera_diff_detection.h"
+#include "motion_data.h"
 
 #include <cstring>
 #include <esp_camera.h>
@@ -29,7 +30,7 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
         return std::make_tuple(MoveDirectionX::None, MoveDirectionY::None);
     }
 
-    // Allocate buffers on first frame
+    // === STEP 1: Allocate buffers on first frame ===
     if (!_buffers_allocated)
     {
         size_t buffer_size = frame->width * frame->height;
@@ -48,135 +49,84 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
         Serial.printf("[DETECTION] Frame buffers allocated: %d bytes each\n", (int)buffer_size);
     }
 
-    // Decompress current frame to greyscale
+    // === STEP 2: Convert current JPEG frame to greyscale ===
     if (!jpeg_to_greyscale(frame, _curr_frame))
     {
-        Serial.println("[DETECTION] Frame decompression failed");
+        Serial.printf("[DETECTION] ERROR: Frame decompression failed (Free heap: %u bytes)\n", esp_get_free_heap_size());
         return std::make_tuple(MoveDirectionX::None, MoveDirectionY::None);
     }
 
-    // On first frame, just store it and return no motion
+    // === STEP 3: Skip first frame (need previous frame to compare) ===
     if (_first_frame)
     {
         memcpy(_prev_frame, _curr_frame, frame->width * frame->height);
         _first_frame = false;
-        Serial.println("[DETECTION] First frame captured, ready for motion detection");
         return std::make_tuple(MoveDirectionX::None, MoveDirectionY::None);
     }
 
-    // Find motion by comparing frames
-    int motion_x = 0, motion_y = 0;
-    bool motion_detected = find_motion(_prev_frame, _curr_frame, frame->width, frame->height, motion_x, motion_y);
+    // === STEP 4: Detect motion by comparing frames ===
+    int motion_centroid_x = 0, motion_centroid_y = 0;
+    int motion_pixel_count = 0;
+    
+    bool motion_found = find_motion(_prev_frame, _curr_frame, frame->width, frame->height, 
+                                    motion_centroid_x, motion_centroid_y, motion_pixel_count);
 
-    // Save current frame as previous for next iteration
+    // === STEP 5: Save current frame as previous for next iteration ===
     memcpy(_prev_frame, _curr_frame, frame->width * frame->height);
 
-    if (!motion_detected)
+    // === STEP 6: Store motion data for HTTP visualization ===
+    // This happens FAST and doesn't allocate/deallocate memory
+    if (motion_found)
+    {
+        _last_motion_data = MotionData(motion_centroid_x, motion_centroid_y, 
+                                       frame->width, frame->height, motion_pixel_count);
+        // Debug output only every 30 frames to avoid serial bottleneck
+        static int debug_counter = 0;
+        if (++debug_counter >= 30)
+        {
+            Serial.printf("[DETECTION] Motion at (%d,%d), pixels: %d\n", 
+                         motion_centroid_x, motion_centroid_y, motion_pixel_count);
+            debug_counter = 0;
+        }
+    }
+    else
+    {
+        _last_motion_data = MotionData(); // Empty motion data (no motion)
+    }
+
+    if (!motion_found)
     {
         return std::make_tuple(MoveDirectionX::None, MoveDirectionY::None);
     }
 
-    // Calculate frame center
+    // === STEP 7: Convert motion centroid to movement direction ===
     int center_x = frame->width / 2;
     int center_y = frame->height / 2;
 
-    // Determine movement direction based on motion offset from center
     MoveDirectionX x_dir = MoveDirectionX::None;
     MoveDirectionY y_dir = MoveDirectionY::None;
 
-    // X-axis (horizontal) - deadzone prevents jitter
-    if (motion_x < center_x - CENTER_DEADZONE)
+    // X-axis: determine if motion is left or right of center (with deadzone)
+    if (motion_centroid_x < center_x - CENTER_DEADZONE)
     {
         x_dir = MoveDirectionX::Left;
-    } else if (motion_x > center_x + CENTER_DEADZONE)
+    }
+    else if (motion_centroid_x > center_x + CENTER_DEADZONE)
     {
         x_dir = MoveDirectionX::Right;
     }
 
-    // Y-axis (vertical) - deadzone prevents jitter
-    if (motion_y < center_y - CENTER_DEADZONE)
+    // Y-axis: determine if motion is up or down from center (with deadzone)
+    if (motion_centroid_y < center_y - CENTER_DEADZONE)
     {
         y_dir = MoveDirectionY::Up;
-    } else if (motion_y > center_y + CENTER_DEADZONE)
+    }
+    else if (motion_centroid_y > center_y + CENTER_DEADZONE)
     {
         y_dir = MoveDirectionY::Down;
     }
 
     return std::make_tuple(x_dir, y_dir);
-}
-
-bool CameraDiffDetection::find_motion(uint8_t* prev, uint8_t* curr, int width, int height, int& center_x, int& center_y)
-{
-    int total_diff = 0;
-    int weighted_x = 0;
-    int weighted_y = 0;
-    int motion_pixels = 0;
-
-    // Compare frames and find differences
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int idx = y * width + x;
-
-            // Calculate absolute difference
-            int diff = abs((int)curr[idx] - (int)prev[idx]);
-
-            // Store difference for potential visualization
-            _diff_buffer[idx] = (diff > 255) ? 255 : (uint8_t)diff;
-
-            // If difference is above threshold, it's motion
-            if (diff > DIFF_THRESHOLD)
-            {
-                weighted_x += x * diff;
-                weighted_y += y * diff;
-                total_diff += diff;
-                motion_pixels++;
-            }
-        }
-    }
-
-    // Require minimum motion pixels
-    if (motion_pixels < MOTION_THRESHOLD)
-    {
-        return false;
-    }
-
-    // Calculate weighted centroid
-    center_x = weighted_x / total_diff;
-    center_y = weighted_y / total_diff;
-
-    // NOISE FILTERING: Reject if centroid is in extreme edges (sensor artifacts)
-    // Skip bottom 10% of image (common sensor noise region)
-    int bottom_edge_y = height - (height / 10);
-
-    // Skip top 5% (rare to have motion there)
-    int top_edge_y = height / 20;
-
-    // Skip left/right 5% (edge artifacts)
-    int left_edge_x = width / 20;
-    int right_edge_x = width - (width / 20);
-
-    // If motion is only in sensor artifact zones, reject it
-    if (center_y > bottom_edge_y && motion_pixels < (MOTION_THRESHOLD * 2))
-    {
-        Serial.printf("[DETECTION] Rejected bottom noise: y=%d (pixels=%d)\n", center_y, motion_pixels);
-        return false;
-    }
-
-    if (center_y < top_edge_y && motion_pixels < (MOTION_THRESHOLD * 2))
-    {
-        Serial.printf("[DETECTION] Rejected top noise: y=%d (pixels=%d)\n", center_y, motion_pixels);
-        return false;
-    }
-
-    if ((center_x < left_edge_x || center_x > right_edge_x) && motion_pixels < (MOTION_THRESHOLD * 2))
-    {
-        Serial.printf("[DETECTION] Rejected edge noise: x=%d (pixels=%d)\n", center_x, motion_pixels);
-        return false;
-    }
-
-    return true;
 }
 
 uint8_t CameraDiffDetection::rgb565_to_greyscale(uint16_t pixel)
@@ -200,4 +150,123 @@ uint8_t CameraDiffDetection::rgb565_to_greyscale(uint16_t pixel)
     uint32_t grey = (r_scaled * 77 + g_scaled * 150 + b_scaled * 29) >> 8;
 
     return (uint8_t)grey;
+}
+
+bool CameraDiffDetection::find_motion(uint8_t* prev, uint8_t* curr, int width, int height, 
+                                      int& center_x, int& center_y, int& pixel_count)
+{
+    // === Step 1: Analyze frame differences ===
+    int total_diff = 0;       // Sum of all pixel differences
+    int weighted_x = 0;       // Sum of (x * pixel_difference)
+    int weighted_y = 0;       // Sum of (y * pixel_difference)
+    int motion_pixels = 0;    // Count of pixels above threshold
+
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            int idx = y * width + x;
+            int diff = abs((int)curr[idx] - (int)prev[idx]);
+
+            // Store for visualization if needed
+            _diff_buffer[idx] = (diff > 255) ? 255 : (uint8_t)diff;
+
+            // Count pixels that changed significantly
+            if (diff > DIFF_THRESHOLD)
+            {
+                weighted_x += x * diff;
+                weighted_y += y * diff;
+                total_diff += diff;
+                motion_pixels++;
+            }
+        }
+    }
+
+    // === Step 2: Check if enough pixels changed ===
+    if (motion_pixels < MOTION_THRESHOLD)
+    {
+        pixel_count = motion_pixels;
+        return false; // Not enough motion
+    }
+
+    // === Step 3: Calculate weighted centroid ===
+    center_x = weighted_x / total_diff;
+    center_y = weighted_y / total_diff;
+
+    // === Step 4: Filter sensor noise (reject motion at image edges) ===
+    // These regions often have artifacts and false positives
+    int bottom_edge_y = height - (height / 10);  // Bottom 10%
+    int top_edge_y = height / 20;                 // Top 5%
+    int left_edge_x = width / 20;                 // Left 5%
+    int right_edge_x = width - (width / 20);      // Right 5%
+
+    // Only reject if motion is ONLY in edge region with insufficient pixels
+    bool is_in_bottom_edge = (center_y > bottom_edge_y);
+    bool is_in_top_edge = (center_y < top_edge_y);
+    bool is_in_left_edge = (center_x < left_edge_x);
+    bool is_in_right_edge = (center_x > right_edge_x);
+
+    if ((is_in_bottom_edge || is_in_top_edge || is_in_left_edge || is_in_right_edge) &&
+        motion_pixels < (MOTION_THRESHOLD * 2))
+    {
+        pixel_count = motion_pixels;
+        return false; // Reject edge noise
+    }
+
+    // === Step 5: Motion confirmed ===
+    pixel_count = motion_pixels;
+    Serial.printf("[CAMERA] Motion detected - Centroid: (%d, %d), Pixels: %d\n", center_x, center_y, motion_pixels);
+    return true;
+}
+
+bool CameraDiffDetection::jpeg_to_greyscale(camera_fb_t* frame, uint8_t* output)
+{
+    if (!frame || !output)
+        return false;
+
+    // === Step 1: Allocate RGB buffer for JPEG decompression ===
+    int w = frame->width;
+    int h = frame->height;
+    size_t rgb_size = (size_t)w * h * 2;
+    
+    // Check available memory before allocation
+    uint32_t free_heap = esp_get_free_heap_size();
+    if (free_heap < (rgb_size + 10000))  // Need buffer + 10KB margin
+    {
+        Serial.printf("[CAMERA] WARNING: Low memory (Free: %u bytes, Need: %u)\n", free_heap, (unsigned int)rgb_size);
+        return false;
+    }
+
+    uint16_t* rgb_buf = (uint16_t*)heap_caps_malloc(rgb_size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    
+    if (!rgb_buf)
+    {
+        Serial.printf("[CAMERA] ERROR: Failed to allocate RGB buffer (Free: %u bytes, Need: %u)\n", free_heap, (unsigned int)rgb_size);
+        return false;
+    }
+
+    // === Step 2: Decompress JPEG to RGB565 ===
+    bool decompress_ok = jpg2rgb565(frame->buf, frame->len, (uint8_t*)rgb_buf, JPG_SCALE_NONE);
+    if (!decompress_ok)
+    {
+        Serial.println("[CAMERA] ERROR: JPEG decompression failed");
+        heap_caps_free(rgb_buf);
+        return false;
+    }
+
+    // === Step 3: Convert RGB565 to greyscale ===
+    for (int i = 0; i < w * h; i++)
+    {
+        output[i] = rgb565_to_greyscale(rgb_buf[i]);
+    }
+
+    // === Step 4: Free temporary buffer immediately ===
+    heap_caps_free(rgb_buf);
+    rgb_buf = nullptr;
+    return true;
+}
+
+MotionData CameraDiffDetection::get_motion_data() const
+{
+    return _last_motion_data;
 }

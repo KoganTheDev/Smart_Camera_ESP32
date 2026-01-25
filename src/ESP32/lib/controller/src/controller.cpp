@@ -27,14 +27,13 @@ void Controller::run()
                                                     : MoveDirectionY::None;
 
         move_directions = std::make_tuple(user_yaw, user_pitch);
-    } else // AI mode
+    }
+    else // AI mode
     {
-        // AI_MODE: Capture frame, run detection, command motors
         camera_fb_t* fb = this->_camera.capture();
 
         if (fb)
         {
-            // Run motion detection algorithm on the captured frame
             move_directions = this->_detection_module.detect_object(fb);
             MoveDirectionX move_x = std::get<0>(move_directions);
             MoveDirectionY move_y = std::get<1>(move_directions);
@@ -46,11 +45,9 @@ void Controller::run()
                               moveDirectionYToString(move_y));
             }
 
-            // Release frame buffer
             this->_camera.release(fb);
         }
     }
 
-    // Send the movement command to the movement manager
     this->_movement_manager.move_relative(move_directions);
 }
