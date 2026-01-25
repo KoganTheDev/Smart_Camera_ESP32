@@ -52,7 +52,8 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
     // === STEP 2: Convert current JPEG frame to greyscale ===
     if (!jpeg_to_greyscale(frame, _curr_frame))
     {
-        Serial.printf("[DETECTION] ERROR: Frame decompression failed (Free heap: %u bytes)\n", esp_get_free_heap_size());
+        Serial.printf("[DETECTION] ERROR: Frame decompression failed (Free heap: %u bytes)\n",
+                      esp_get_free_heap_size());
         return std::make_tuple(MoveDirectionX::None, MoveDirectionY::None);
     }
 
@@ -67,9 +68,9 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
     // === STEP 4: Detect motion by comparing frames ===
     int motion_centroid_x = 0, motion_centroid_y = 0;
     int motion_pixel_count = 0;
-    
-    bool motion_found = find_motion(_prev_frame, _curr_frame, frame->width, frame->height, 
-                                    motion_centroid_x, motion_centroid_y, motion_pixel_count);
+
+    bool motion_found = find_motion(_prev_frame, _curr_frame, frame->width, frame->height, motion_centroid_x,
+                                    motion_centroid_y, motion_pixel_count);
 
     // === STEP 5: Save current frame as previous for next iteration ===
     memcpy(_prev_frame, _curr_frame, frame->width * frame->height);
@@ -78,18 +79,17 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
     // This happens FAST and doesn't allocate/deallocate memory
     if (motion_found)
     {
-        _last_motion_data = MotionData(motion_centroid_x, motion_centroid_y, 
-                                       frame->width, frame->height, motion_pixel_count);
+        _last_motion_data =
+            MotionData(motion_centroid_x, motion_centroid_y, frame->width, frame->height, motion_pixel_count);
         // Debug output only every 30 frames to avoid serial bottleneck
         static int debug_counter = 0;
         if (++debug_counter >= 30)
         {
-            Serial.printf("[DETECTION] Motion at (%d,%d), pixels: %d\n", 
-                         motion_centroid_x, motion_centroid_y, motion_pixel_count);
+            Serial.printf("[DETECTION] Motion at (%d,%d), pixels: %d\n", motion_centroid_x, motion_centroid_y,
+                          motion_pixel_count);
             debug_counter = 0;
         }
-    }
-    else
+    } else
     {
         _last_motion_data = MotionData(); // Empty motion data (no motion)
     }
@@ -110,8 +110,7 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
     if (motion_centroid_x < center_x - CENTER_DEADZONE)
     {
         x_dir = MoveDirectionX::Left;
-    }
-    else if (motion_centroid_x > center_x + CENTER_DEADZONE)
+    } else if (motion_centroid_x > center_x + CENTER_DEADZONE)
     {
         x_dir = MoveDirectionX::Right;
     }
@@ -120,8 +119,7 @@ std::tuple<MoveDirectionX, MoveDirectionY> CameraDiffDetection::detect_object(ca
     if (motion_centroid_y < center_y - CENTER_DEADZONE)
     {
         y_dir = MoveDirectionY::Up;
-    }
-    else if (motion_centroid_y > center_y + CENTER_DEADZONE)
+    } else if (motion_centroid_y > center_y + CENTER_DEADZONE)
     {
         y_dir = MoveDirectionY::Down;
     }
@@ -152,14 +150,14 @@ uint8_t CameraDiffDetection::rgb565_to_greyscale(uint16_t pixel)
     return (uint8_t)grey;
 }
 
-bool CameraDiffDetection::find_motion(uint8_t* prev, uint8_t* curr, int width, int height, 
-                                      int& center_x, int& center_y, int& pixel_count)
+bool CameraDiffDetection::find_motion(uint8_t* prev, uint8_t* curr, int width, int height, int& center_x, int& center_y,
+                                      int& pixel_count)
 {
     // === Step 1: Analyze frame differences ===
-    int total_diff = 0;       // Sum of all pixel differences
-    int weighted_x = 0;       // Sum of (x * pixel_difference)
-    int weighted_y = 0;       // Sum of (y * pixel_difference)
-    int motion_pixels = 0;    // Count of pixels above threshold
+    int total_diff = 0;    // Sum of all pixel differences
+    int weighted_x = 0;    // Sum of (x * pixel_difference)
+    int weighted_y = 0;    // Sum of (y * pixel_difference)
+    int motion_pixels = 0; // Count of pixels above threshold
 
     for (int y = 0; y < height; y++)
     {
@@ -195,10 +193,10 @@ bool CameraDiffDetection::find_motion(uint8_t* prev, uint8_t* curr, int width, i
 
     // === Step 4: Filter sensor noise (reject motion at image edges) ===
     // These regions often have artifacts and false positives
-    int bottom_edge_y = height - (height / 10);  // Bottom 10%
-    int top_edge_y = height / 20;                 // Top 5%
-    int left_edge_x = width / 20;                 // Left 5%
-    int right_edge_x = width - (width / 20);      // Right 5%
+    int bottom_edge_y = height - (height / 10); // Bottom 10%
+    int top_edge_y = height / 20;               // Top 5%
+    int left_edge_x = width / 20;               // Left 5%
+    int right_edge_x = width - (width / 20);    // Right 5%
 
     // Only reject if motion is ONLY in edge region with insufficient pixels
     bool is_in_bottom_edge = (center_y > bottom_edge_y);
@@ -228,20 +226,21 @@ bool CameraDiffDetection::jpeg_to_greyscale(camera_fb_t* frame, uint8_t* output)
     int w = frame->width;
     int h = frame->height;
     size_t rgb_size = (size_t)w * h * 2;
-    
+
     // Check available memory before allocation
     uint32_t free_heap = esp_get_free_heap_size();
-    if (free_heap < (rgb_size + 10000))  // Need buffer + 10KB margin
+    if (free_heap < (rgb_size + 10000)) // Need buffer + 10KB margin
     {
         Serial.printf("[CAMERA] WARNING: Low memory (Free: %u bytes, Need: %u)\n", free_heap, (unsigned int)rgb_size);
         return false;
     }
 
     uint16_t* rgb_buf = (uint16_t*)heap_caps_malloc(rgb_size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    
+
     if (!rgb_buf)
     {
-        Serial.printf("[CAMERA] ERROR: Failed to allocate RGB buffer (Free: %u bytes, Need: %u)\n", free_heap, (unsigned int)rgb_size);
+        Serial.printf("[CAMERA] ERROR: Failed to allocate RGB buffer (Free: %u bytes, Need: %u)\n", free_heap,
+                      (unsigned int)rgb_size);
         return false;
     }
 
@@ -266,7 +265,4 @@ bool CameraDiffDetection::jpeg_to_greyscale(camera_fb_t* frame, uint8_t* output)
     return true;
 }
 
-MotionData CameraDiffDetection::get_motion_data() const
-{
-    return _last_motion_data;
-}
+MotionData CameraDiffDetection::get_motion_data() const { return _last_motion_data; }

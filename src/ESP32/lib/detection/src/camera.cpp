@@ -10,12 +10,11 @@ bool Camera::begin()
         return false;
     }
 
-    Serial.printf("[CAMERA] PSRAM Free/Total Size: %d/%d bytes\n", ESP.getFreePsram() ,ESP.getPsramSize());
+    Serial.printf("[CAMERA] PSRAM Free/Total Size: %d/%d bytes\n", ESP.getFreePsram(), ESP.getPsramSize());
 
     esp_err_t err = ESP_FAIL;
 
     err = esp_camera_init(&_config);
-
 
     if (err != ESP_OK)
     {

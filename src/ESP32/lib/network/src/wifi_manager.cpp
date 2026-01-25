@@ -17,15 +17,15 @@ void WifiManager::connect(const String& ssid, const String& password)
     {
         delay(500);
         Serial.print(".");
-        
-        if (millis() > 30000) { // 30 second timeout
+
+        if (millis() > 30000)
+        { // 30 second timeout
             Serial.println("\n[WIFI] Connection Failed: Timeout");
             return;
         }
-        
     }
 
-    Serial.printf("\n[WIFI] Connected! ESP's IP Address: %s\n", get_ip().c_str()); 
+    Serial.printf("\n[WIFI] Connected! ESP's IP Address: %s\n", get_ip().c_str());
 }
 
 bool WifiManager::is_connected() { return WiFi.status() == WL_CONNECTED; }

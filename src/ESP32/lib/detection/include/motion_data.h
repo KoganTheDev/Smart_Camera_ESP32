@@ -16,19 +16,18 @@
 class MotionData
 {
 private:
-    bool _detected;     ///< Whether motion was detected
-    int _centroid_x;    ///< X coordinate of motion center (0 if not detected)
-    int _centroid_y;    ///< Y coordinate of motion center (0 if not detected)
-    int _frame_width;   ///< Width of frame where motion was detected
-    int _frame_height;  ///< Height of frame where motion was detected
-    int _pixel_count;   ///< Number of pixels that changed
+    bool _detected;    ///< Whether motion was detected
+    int _centroid_x;   ///< X coordinate of motion center (0 if not detected)
+    int _centroid_y;   ///< Y coordinate of motion center (0 if not detected)
+    int _frame_width;  ///< Width of frame where motion was detected
+    int _frame_height; ///< Height of frame where motion was detected
+    int _pixel_count;  ///< Number of pixels that changed
 
 public:
     /**
      * @brief Constructor: Create empty motion data (no motion detected).
      */
-    MotionData()
-        : _detected(false), _centroid_x(0), _centroid_y(0), _frame_width(0), _frame_height(0), _pixel_count(0)
+    MotionData() : _detected(false), _centroid_x(0), _centroid_y(0), _frame_width(0), _frame_height(0), _pixel_count(0)
     {
     }
 

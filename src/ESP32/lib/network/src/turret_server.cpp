@@ -3,9 +3,9 @@
 #include <esp_log.h>
 
 #include "camera_diff_detection.h"
-#include "motion_data.h"
 #include "esp_camera.h"
 #include "image_overlay.h"
+#include "motion_data.h"
 #include <index_html.h>
 
 #define _STREAM_CONTENT_TYPE "multipart/x-mixed-replace;boundary=123456789000000000000987654321"
@@ -85,8 +85,8 @@ esp_err_t HttpServer::stream_handler(httpd_req_t* req)
 
     // 3. Start the Infinite Streaming Loop
     uint32_t last_frame_time = millis();
-    const uint32_t MIN_FRAME_INTERVAL = 33;  // ~30 FPS max (33ms per frame)
-    
+    const uint32_t MIN_FRAME_INTERVAL = 33; // ~30 FPS max (33ms per frame)
+
     while (true)
     {
         // Limit frame rate to prevent blocking motion detection
@@ -94,7 +94,7 @@ esp_err_t HttpServer::stream_handler(httpd_req_t* req)
         uint32_t elapsed = now - last_frame_time;
         if (elapsed < MIN_FRAME_INTERVAL)
         {
-            vTaskDelay(1);  // Yield to other tasks
+            vTaskDelay(1); // Yield to other tasks
             continue;
         }
         last_frame_time = now;

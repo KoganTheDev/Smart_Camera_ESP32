@@ -27,8 +27,7 @@ void Controller::run()
                                                     : MoveDirectionY::None;
 
         move_directions = std::make_tuple(user_yaw, user_pitch);
-    }
-    else // AI mode
+    } else // AI mode
     {
         camera_fb_t* fb = this->_camera.capture();
 

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "motion_data.h"
 #include <Arduino.h>
 #include <base_detection_module.h>
-#include "motion_data.h"
 
 /**
  * @class CameraDiffDetection
@@ -16,9 +16,9 @@ class CameraDiffDetection : public BaseDetectionModule
 private:
     // Sensitivity parameters (tune these for your environment)
     // QVGA is 320x240 = 76,800 pixels total
-    static const int DIFF_THRESHOLD = 20; ///< Pixel difference threshold (0-255)
+    static const int DIFF_THRESHOLD = 20;    ///< Pixel difference threshold (0-255)
     static const int MOTION_THRESHOLD = 800; ///< Minimum pixels that changed to consider motion
-    static const int CENTER_DEADZONE = 80; ///< Pixels around center for stable tracking
+    static const int CENTER_DEADZONE = 80;   ///< Pixels around center for stable tracking
 
     uint8_t* _prev_frame;    ///< Previous frame greyscale buffer
     uint8_t* _curr_frame;    ///< Current frame greyscale buffer
@@ -62,5 +62,6 @@ private:
      * @param pixel_count Output count of pixels that detected motion
      * @return true if significant motion was found
      */
-    bool find_motion(uint8_t* prev, uint8_t* curr, int width, int height, int& center_x, int& center_y, int& pixel_count);
+    bool find_motion(uint8_t* prev, uint8_t* curr, int width, int height, int& center_x, int& center_y,
+                     int& pixel_count);
 };
