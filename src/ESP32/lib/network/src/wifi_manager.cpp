@@ -14,6 +14,12 @@ void WifiManager::connect(const String& ssid, const String& password)
     WiFi.mode(WIFI_STA); // Enter Station mode
     WiFi.begin(ssid, password);
     WiFi.setAutoReconnect(true);
+
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.print(".");
+        delay(500);
+    }
 }
 
 bool WifiManager::is_connected() { return WiFi.status() == WL_CONNECTED; }

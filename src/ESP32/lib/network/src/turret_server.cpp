@@ -10,11 +10,12 @@
 static const char* _STREAM_BOUNDARY = "\r\n--123456789000000000000987654321\r\n";
 static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
 
-Camera* HttpServer::_camera_instance = nullptr; // Init static pointer
+Camera* HttpServer::_camera_instance = nullptr;
 
 bool HttpServer::start(Camera* camera)
 {
     this->_camera_instance = camera;
+
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
     if (httpd_start(&this->_server_handle, &config) == ESP_OK)
@@ -54,6 +55,7 @@ esp_err_t HttpServer::stream_handler(httpd_req_t* req)
     size_t _jpg_buf_len = 0;
     uint8_t* _jpg_buf = NULL;
     char* part_buf[64];
+    int frame_count = 0;
 
     // 1. Safety Check: Ensure camera and request are valid
     if (req == NULL)
@@ -64,7 +66,7 @@ esp_err_t HttpServer::stream_handler(httpd_req_t* req)
     if (HttpServer::_camera_instance == nullptr)
     {
         Serial.println("Stream Error: Camera instance is null");
-        return httpd_resp_send_500(req); // 500: internal server error
+        return httpd_resp_send_500(req);
     }
 
     // 2. Set the HTTP Response Header to Multipart
@@ -74,25 +76,19 @@ esp_err_t HttpServer::stream_handler(httpd_req_t* req)
         return res;
     }
 
-    Serial.println("Client connected to stream");
+    Serial.println("[STREAM] Client connected to stream");
 
     // 3. Start the Infinite Streaming Loop
     while (true)
     {
-        // Grab frame
+        // Grab frame - don't block, use GRAB_LATEST to skip frames if needed
         fb = HttpServer::_camera_instance->capture();
 
-        if (!fb)
-        {
-            Serial.println("Camera capture failed");
-            res = ESP_FAIL;
-        } else
-        {
-            _jpg_buf_len = fb->len;
-            _jpg_buf = fb->buf;
-        }
+        _jpg_buf_len = fb->len;
+        _jpg_buf = fb->buf;
+        frame_count++;
 
-        if (res == ESP_OK)
+        if (res == ESP_OK && _jpg_buf_len > 0)
         {
             // Send the boundary separator
             res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
@@ -119,13 +115,21 @@ esp_err_t HttpServer::stream_handler(httpd_req_t* req)
             _jpg_buf = NULL;
         }
 
-        // 5. Check if the client closed the tab/browser
+        // 5. Log periodically (every 60 frames = ~2-3 seconds at 20-30 FPS) to reduce serial spam
+        if (frame_count % 60 == 0)
+        {
+            Serial.printf("[STREAM] Streaming... (frame %d)\n", frame_count);
+        }
+
+        // 6. Check if the client closed the tab/browser
         if (res != ESP_OK)
         {
-            Serial.println("Stream stopped: Client disconnected");
+            Serial.printf("[STREAM] Stream error: %s\n", esp_err_to_name(res));
+            Serial.println("[STREAM] Client disconnected");
             break;
         }
 
+        // Small delay to yield to other RTOS tasks (especially motion detection in main loop)
         vTaskDelay(1);
     }
 
