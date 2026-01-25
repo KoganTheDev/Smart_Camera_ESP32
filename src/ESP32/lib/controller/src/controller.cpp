@@ -42,7 +42,8 @@ void Controller::run()
             // Log detection results only when motion is found
             if (move_x != MoveDirectionX::None || move_y != MoveDirectionY::None)
             {
-                Serial.printf("[AI_MODE] Motion detected - Moving X:%s Y:%s\n", moveDirectionXToString(move_x), moveDirectionYToString(move_y));
+                Serial.printf("[AI_MODE] Motion detected - Moving X:%s Y:%s\n", moveDirectionXToString(move_x),
+                              moveDirectionYToString(move_y));
             }
 
             // Release frame buffer
