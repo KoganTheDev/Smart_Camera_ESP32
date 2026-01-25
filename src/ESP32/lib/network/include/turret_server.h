@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "base_detection_module.h"
 #include "camera.h"
 #include <esp_http_server.h>
 
@@ -24,13 +25,19 @@ private:
      */
     static Camera* _camera_instance;
 
+    /**
+     * @brief Static reference to motion detection module for drawing targets.
+     */
+    static BaseDetectionModule* _detection_instance;
+
 public:
     /**
      * @brief Configures and launches the web server on port 80.
      * @param camera Pointer to the initialized Camera object for streaming.
+     * @param detection Optional pointer to detection module for motion visualization.
      * @return true if the server was created and handlers were registered.
      */
-    bool start(Camera* camera);
+    bool start(Camera* camera, BaseDetectionModule* detection = nullptr);
 
     /**
      * @brief Shut down the server and unregister all URI handlers.
