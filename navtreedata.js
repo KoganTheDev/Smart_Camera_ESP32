@@ -25,6 +25,9 @@
 var NAVTREE =
 [
   [ "Smart Camera ESP32", "index.html", [
+    [ "🎯 Smart Camera ESP32: Motion Target Acquisition", "index.html", [
+      [ "🚀 Core Features", "index.html#autotoc_md2", null ]
+    ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ]
     ] ],
