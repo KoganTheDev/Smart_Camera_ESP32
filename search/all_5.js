@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['httpserver_0',['HttpServer',['../classHttpServer.html',1,'']]]
+  ['features_0',['🚀 Core Features',['../index.html#autotoc_md2',1,'']]]
 ];

@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['maintain_0',['maintain',['../classWifiManager.html#a176f051b2bcf1f14c355f0150b85e68a',1,'WifiManager']]],
-  ['move_5frelative_1',['move_relative',['../classBaseMovementManager.html#a9cbbbe3137401eb48171b99bb25fb585',1,'BaseMovementManager::move_relative()'],['../classMovementManager.html#a687108e2497d91439702209c6474c6b7',1,'MovementManager::move_relative(const std::tuple&lt; MoveDirectionX, MoveDirectionY &gt; move_directions)']]],
-  ['move_5fservo_2',['move_servo',['../classMovementManager.html#a95656a770dc565940f34f8c747e80d56',1,'MovementManager']]],
-  ['move_5fstepper_3',['move_stepper',['../classMovementManager.html#acd571aa69a0eacf0d09e673c16c93c8d',1,'MovementManager']]],
-  ['movement_5fmanager_2eh_4',['movement_manager.h',['../movement__manager_8h.html',1,'']]],
-  ['movementmanager_5',['MovementManager',['../classMovementManager.html',1,'MovementManager'],['../classMovementManager.html#a1332de4fa00695f623334605f0e42cfb',1,'MovementManager::MovementManager()']]]
+  ['index_5fhandler_0',['index_handler',['../classHttpServer.html#ac37693f45d9eac094872a2c67cb44245',1,'HttpServer']]],
+  ['index_5fhtml_2eh_1',['index_html.h',['../index__html_8h.html',1,'']]],
+  ['is_5fconnected_2',['is_connected',['../classWifiManager.html#ab90b63a72a420c96e221b57ea64b9b4a',1,'WifiManager']]],
+  ['is_5fpresent_3',['is_present',['../classSDManager.html#ad803699e899d17d45ac7dfe9c316e045',1,'SDManager']]],
+  ['is_5fz_5fheld_4',['is_z_held',['../classJoystick.html#a7a9b93194e4622ba6a6f17a072ae53c1',1,'Joystick']]],
+  ['is_5fz_5fpressed_5',['is_z_pressed',['../classJoystick.html#ac75bdb237df7b3b305af353468d7d185',1,'Joystick']]]
 ];

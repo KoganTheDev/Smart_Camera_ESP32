@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['🎯_20smart_20camera_20esp32_3a_20motion_20target_20acquisition_0',['🎯 Smart Camera ESP32: Motion Target Acquisition',['../index.html',1,'']]]
+  ['wifimanager_0',['WifiManager',['../classWifiManager.html',1,'']]],
+  ['wroverpins_1',['WroverPins',['../namespaceWroverPins.html',1,'']]]
 ];
